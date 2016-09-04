@@ -31,11 +31,6 @@ public class MapFromContactsAsyncActivity
     private static final int PICK_CONTACT_REQUEST = 0;
 
     /**
-     * Request code for READ_CONTACTS.
-     */
-    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 1;
-
-    /**
      * Holds reference to the floating action button for animations.
      */
     private static ImageButton mAddButton;
@@ -106,16 +101,6 @@ public class MapFromContactsAsyncActivity
         // the request code is what we're expecting.
         if (resultCode == Activity.RESULT_OK
             && requestCode == PICK_CONTACT_REQUEST) {
-
-            // Checks whether the build SDK version is greater than
-            // that of Android M; if it is then ask for permission to
-            // read contacts as per the changes implemented in
-            // permission requests for Android M and above.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M 
-                && checkSelfPermission(Manifest.permission.READ_CONTACTS) 
-                != PackageManager.PERMISSION_GRANTED) 
-                requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
-                                   PERMISSIONS_REQUEST_READ_CONTACTS);
 
             // Display a map with the contact data.
             displayMap(data);

@@ -27,10 +27,25 @@ public class ContactAddressMapper {
     private Activity mActivity;
 
     /**
+     *  Request code for READ_CONTACTS.
+     */
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 1;
+
+    /**
      * Constructor initializes the Context field.
      */
     public ContactAddressMapper(Activity activity) {
         mActivity = activity;
+
+        // Checks whether the build SDK version is greater than
+        // that of Android M; if it is then ask for permission to
+        // read contacts as per the changes implemented in permission
+        // requests for Android M and above.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+            && mActivity.checkSelfPermission(Manifest.permission.READ_CONTACTS)
+                         != PackageManager.PERMISSION_GRANTED)
+            mActivity.requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
+                                         PERMISSIONS_REQUEST_READ_CONTACTS);
     }
 
     /**
