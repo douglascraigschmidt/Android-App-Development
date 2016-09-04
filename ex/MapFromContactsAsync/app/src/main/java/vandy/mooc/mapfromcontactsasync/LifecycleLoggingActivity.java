@@ -1,4 +1,4 @@
-package vandy.mooc.maplocationfromcontacts;
+package vandy.mooc.mapfromcontactsasync;
 
 import android.app.Activity;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package vandy.mooc.maplocationfromcontacts;
+package vandy.mooc.mapfromcontactshamer;
 
 import android.app.Activity;
 import android.os.Bundle;

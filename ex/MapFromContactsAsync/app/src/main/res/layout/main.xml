@@ -7,7 +7,7 @@
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20dp"
-        android:text="Please touch the floating button to select a contact"
+        android:text="@string/prompt"
         android:gravity="center"
         android:layout_marginTop="7dp"/>
 
@@ -29,9 +29,6 @@
             android:elevation="1dp"
             android:src="@drawable/icon_add"
             android:onClick="findAddress"/>
-
     </LinearLayout>
-
-
 </LinearLayout>
 

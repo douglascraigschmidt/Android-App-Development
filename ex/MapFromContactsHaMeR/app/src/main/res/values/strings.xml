@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">MapLocationFromContacts</string>
+    <string name="app_name">MapFromContactsHaMeR</string>
     <string name="findAddress">Find Address</string>
+    <string name="prompt">Please touch the floating action button to select a contact</string>
 </resources>

@@ -1,17 +1,12 @@
-package vandy.mooc.maplocationfromcontacts;
+package vandy.mooc.mapfromcontactshamer;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ActivityOptions;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.drawable.Animatable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.transition.Slide;
 import android.view.View;
 import android.widget.ImageButton;
@@ -33,14 +28,15 @@ public class MapFromContactsHaMeRActivity
     private static final int PICK_CONTACT_REQUEST = 0;
 
     /**
-     *  Request code for READ_CONTACTS.
-     */
-    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 1;
-
-    /**
      * Holds reference to the floating action button for animations.
      */
     private static ImageButton mAddButton;
+
+    /**
+     * Implements the details of starting a mapper Activity from
+     * contact data.
+     */
+    private ContactAddressMapper mContactAddressMapper;
 
     /**
      * Hook method called when a new instance of Activity is created.
@@ -60,6 +56,10 @@ public class MapFromContactsHaMeRActivity
         // Create a reference to the add FAB
         mAddButton = (ImageButton) findViewById(R.id.addButton);
 
+        // Create a ContactMapper to start the appropriate mapper for
+        // the contact data.
+        mContactAddressMapper = new ContactAddressMapper(this);
+
         // Sets up the slide animation upon the exit of the main
         // activity.
         setupWindowAnimations();
@@ -67,35 +67,20 @@ public class MapFromContactsHaMeRActivity
 
     /**
      * Called by the Android Activity framework when the user clicks
-     * the "Find Address" button.
+     * the "Floating Action Button" on the screen.
      */
     public void findAddress(View v) {
         try {
             // Animation that morphs the design of the floating action
             // button.
             mAddButton.setImageResource(R.drawable.icon_morph);
-
             Animatable mAnimatable =
                 (Animatable) (mAddButton).getDrawable();
             mAnimatable.start();
 
-            // Create a new Intent that matches with the Contacts
-            // ContentProvider.
-            Intent intent = new Intent(Intent.ACTION_PICK,
-                                       ContactsContract.Contacts.CONTENT_URI);
-
-            // Pass on a bundle to achieve the screen transitions used when the
-            // activity changes.
-            Bundle bundle = 
-                ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
-
-            // Start the Contacts ContentProvider Activity, which will
-            // prompt the user to pick a contact and then return the
-            // Uri for the selected contact via the onActivityResult()
-            // hook method.
-            startActivityForResult(intent,
-                                   PICK_CONTACT_REQUEST,
-                                   bundle);
+            // Start the ContactsContentProvider Activity to get a Uri
+            // for a selected contact.
+            mContactAddressMapper.startContactPicker(PICK_CONTACT_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -116,16 +101,7 @@ public class MapFromContactsHaMeRActivity
         if (resultCode == Activity.RESULT_OK
             && requestCode == PICK_CONTACT_REQUEST) {
 
-            // Checks whether the build SDK version is greater than
-            // that of Android M; if it is then ask for permission to
-            // read contacts as per the changes implemented in permission
-            // requests for Android M and above.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M 
-                && checkSelfPermission(Manifest.permission.READ_CONTACTS) 
-                != PackageManager.PERMISSION_GRANTED) 
-                requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
-                                   PERMISSIONS_REQUEST_READ_CONTACTS);
-
+            // Display a map with the contact data.
             displayMap(data);
         }
     }
@@ -140,159 +116,23 @@ public class MapFromContactsHaMeRActivity
         // Use the Android HaMeR framework to create a Runnable so the
         // (potentially) long-duration getAddressFromContact() method
         // can run without blocking the UI Thread.
-        final Runnable getAndDisplayAddressFromContact =
-                () -> {
-                    // Extract the address from the contact record
-                    // indicated by the Uri associated with the
-                    // Intent.
-                    final String address =
-                            getAddressFromContact(data.getData());
+        final Runnable getAndDisplayAddressFromContact = () -> {
+            // Extract address from contact record indicated
+            // by the Uri associated with the Intent data.
+            String address =
+                mContactAddressMapper.getAddressFromContact(data.getData());
 
-                    runOnUiThread(() -> {
-                        // Launch the activity by sending an
-                        // intent.  Android will choose the right
-                        // one or let the user choose if more than
-                        // one Activity can handle it.
-
-                        // Create an Intent that will launch the
-                        // "Maps" app.
-                        final Intent geoIntent =
-                                makeMapsIntent(address);
-
-                        // Check to see if there's a Map app to
-                        // handle the "geo" intent.
-                        if (geoIntent.resolveActivity
-                            (getPackageManager()) != null)
-                            startActivity(geoIntent);
-                        else
-                            // Start the Browser app instead.
-                            startActivity(makeBrowserIntent(address));
-                    });
-                };
+            // Launch the mapper Activity in the UI thread.
+            runOnUiThread(() -> 
+                          mContactAddressMapper.startMapperActivity(address));
+        };
 
         // Create a new Thread to get the address from the contact and
         // launch the appropriate Activity to display the address.
         new Thread(getAndDisplayAddressFromContact).start();
 
-        // if you don't want to use a separate Thread just say:
+        // If you don't want to use a separate Thread just say:
         // getAndDisplayAddressFromContact.run();
-    }
-
-    /**
-     * Extracts a street address from the Uri of the contact in the
-     * Contacts Content Provider.
-     */
-    private String getAddressFromContact(Uri contactUri) {
-        // Obtain a reference to our Content Resolver.
-        ContentResolver cr = getContentResolver();
-
-        // Obtain a cursor to the appropriate contact at the
-        // designated Uri.
-        String id;
-        String where;
-        String[] whereParameters;
-        try (Cursor cursor = cr.query(contactUri,
-                null, null, null, null)) {
-
-            // Start the cursor at the beginning.
-            assert cursor != null;
-            cursor.moveToFirst();
-
-            // Obtain the id of the contact.
-            id = cursor.getString
-                    (cursor.getColumnIndex(ContactsContract.Contacts._ID));
-        }
-
-        // Create an SQL "where" clause that will search for the
-        // street address of the designated contact Id.
-        where = ContactsContract.Data.CONTACT_ID
-                + " = ? AND "
-                + ContactsContract.Data.MIMETYPE
-                + " = ?";
-        whereParameters = new String[]{
-                id,
-                ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE
-        };
-
-        // Create a cursor that contains the results of a query for
-        // the street address of the designated contact Id.
-        try (Cursor addrCursor = cr.query(ContactsContract.Data.CONTENT_URI,
-                                          null,
-                                          where,
-                                          whereParameters,
-                                          null)) {
-            // Start the cursor at the beginning.
-            assert addrCursor != null;
-            addrCursor.moveToFirst();
-
-            // Extract the street name.
-            String street = addrCursor
-                .getString(addrCursor
-                           .getColumnIndex(ContactsContract.
-                                           CommonDataKinds.
-                                           StructuredPostal.
-                                           STREET));
-
-            // Extract the city name.
-            String city = addrCursor
-                .getString(addrCursor
-                           .getColumnIndex(ContactsContract.
-                                           CommonDataKinds.
-                                           StructuredPostal.
-                                           CITY));
-
-            // Extract the state.
-            String state = addrCursor
-                .getString(addrCursor
-                           .getColumnIndex(ContactsContract.
-                                           CommonDataKinds.
-                                           StructuredPostal.
-                                           REGION));
-
-            // Extract the zip code.
-            String postalCode = addrCursor
-                .getString(addrCursor
-                           .getColumnIndex(ContactsContract.
-                                           CommonDataKinds.
-                                           StructuredPostal.
-                                           POSTCODE));
-
-            // Create an address from the various pieces obtained
-            // above.
-
-            // Return the address.
-            return street
-            + "+"
-            + city
-            + "+"
-            + state
-            + "+"
-            + postalCode;
-        }
-    }
-
-    /**
-     * Factory method that returns an Intent that designates the "Map"
-     * app.
-     */
-    private Intent makeMapsIntent(String address) {
-        // Note the "loose coupling" between the Intent and the app(s)
-        // that handle this Intent.
-        return new Intent(Intent.ACTION_VIEW,
-                          Uri.parse("geo:0,0?q="
-                                    + address));
-    }
-
-    /**
-     * Factory method that returns an Intent that designates the
-     * "Browser" app.
-     */
-    private Intent makeBrowserIntent(String address) {
-        // Note the "loose coupling" between the Intent and the app(s)
-        // that handle this Intent.
-        return new Intent(Intent.ACTION_VIEW,
-                          Uri.parse("http://maps.google.com/?q="
-                                    + address));
     }
 
     /**
