@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MapLocationFromContacts</string>
+    <string name="findAddress">Find Address</string>
+</resources>

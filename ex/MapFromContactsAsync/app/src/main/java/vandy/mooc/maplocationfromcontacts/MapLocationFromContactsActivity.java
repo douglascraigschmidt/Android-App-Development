@@ -12,16 +12,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.transition.Explode;
-import android.transition.Fade;
 import android.transition.Slide;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 /**
  * An Activity that maps a location from the address of a contact.
@@ -131,8 +124,8 @@ public class MapLocationFromContactsActivity
                 != PackageManager.PERMISSION_GRANTED) 
                 requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
                                    PERMISSIONS_REQUEST_READ_CONTACTS);
-            else 
-                displayMap(data);
+
+            displayMap(data);
         }
     }
 
@@ -147,40 +140,34 @@ public class MapLocationFromContactsActivity
         // getAddressFromContact() method can run without blocking the
         // UI Thread.
         final Runnable getAndDisplayAddressFromContact =
-            new Runnable() {
-                @Override
-                public void run() {
+                () -> {
                     // Extract the address from the contact record
                     // indicated by the Uri associated with the
                     // Intent.
                     final String address =
                             getAddressFromContact(data.getData());
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            // Launch the activity by sending an
-                            // intent.  Android will choose the right
-                            // one or let the user choose if more than
-                            // one Activity can handle it.
+                    runOnUiThread(() -> {
+                        // Launch the activity by sending an
+                        // intent.  Android will choose the right
+                        // one or let the user choose if more than
+                        // one Activity can handle it.
 
-                            // Create an Intent that will launch the
-                            // "Maps" app.
-                            final Intent geoIntent =
-                                    makeMapsIntent(address);
+                        // Create an Intent that will launch the
+                        // "Maps" app.
+                        final Intent geoIntent =
+                                makeMapsIntent(address);
 
-                            // Check to see if there's a Map app to
-                            // handle the "geo" intent.
-                            if (geoIntent.resolveActivity
-                                (getPackageManager()) != null)
-                                startActivity(geoIntent);
-                            else
-                                // Start the Browser app instead.
-                                startActivity(makeBrowserIntent(address));
-                        }
+                        // Check to see if there's a Map app to
+                        // handle the "geo" intent.
+                        if (geoIntent.resolveActivity
+                            (getPackageManager()) != null)
+                            startActivity(geoIntent);
+                        else
+                            // Start the Browser app instead.
+                            startActivity(makeBrowserIntent(address));
                     });
-                }
-            };
+                };
 
         // Create a new Thread to get the address from the contact and
         // launch the appropriate Activity to display the address.
@@ -200,26 +187,30 @@ public class MapLocationFromContactsActivity
 
         // Obtain a cursor to the appropriate contact at the
         // designated Uri.
-        Cursor cursor =
-            cr.query(contactUri,
-                     null, null, null, null);
+        String id;
+        String where;
+        String[] whereParameters;
+        try (Cursor cursor = cr.query(contactUri,
+                null, null, null, null)) {
 
-        // Start the cursor at the beginning.
-        cursor.moveToFirst();
+            // Start the cursor at the beginning.
+            assert cursor != null;
+            cursor.moveToFirst();
 
-        // Obtain the id of the contact.
-        String id = cursor.getString
-            (cursor.getColumnIndex(ContactsContract.Contacts._ID));
+            // Obtain the id of the contact.
+            id = cursor.getString
+                    (cursor.getColumnIndex(ContactsContract.Contacts._ID));
+        }
 
         // Create an SQL "where" clause that will search for the
         // street address of the designated contact Id.
-        String where = ContactsContract.Data.CONTACT_ID 
-            + " = ? AND "
-            + ContactsContract.Data.MIMETYPE 
-            + " = ?";
-        String[] whereParameters = new String[] {
-            id,
-            ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE 
+        where = ContactsContract.Data.CONTACT_ID
+                + " = ? AND "
+                + ContactsContract.Data.MIMETYPE
+                + " = ?";
+        whereParameters = new String[]{
+                id,
+                ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE
         };
 
         // Create a cursor that contains the results of a query for
@@ -230,6 +221,7 @@ public class MapLocationFromContactsActivity
                                           whereParameters,
                                           null)) {
             // Start the cursor at the beginning.
+            assert addrCursor != null;
             addrCursor.moveToFirst();
 
             // Extract the street name.
@@ -266,17 +258,15 @@ public class MapLocationFromContactsActivity
 
             // Create an address from the various pieces obtained
             // above.
-            String address =
-                street
-                + "+"
-                + city
-                + "+"
-                + state
-                + "+"
-                + postalCode;
 
             // Return the address.
-            return address;
+            return street
+            + "+"
+            + city
+            + "+"
+            + state
+            + "+"
+            + postalCode;
         }
     }
 
