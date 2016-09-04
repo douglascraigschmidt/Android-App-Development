@@ -17,9 +17,10 @@ import android.view.View;
 import android.widget.ImageButton;
 
 /**
- * An Activity that maps a location from the address of a contact.
+ * An Activity that maps a location from the address of a contact
+ * using an AsyncTask.
  */
-public class MapLocationFromContactsActivity 
+public class MapFromContactsAsyncActivity 
        extends LifecycleLoggingActivity {
     /**
      * Debugging tag used by the Android logger.
@@ -136,45 +137,38 @@ public class MapLocationFromContactsActivity
      * @param data Intent that holds the data of the contact
      */
     private void displayMap(final Intent data) {
-        // Create a Runnable so the (potentially) long-duration
-        // getAddressFromContact() method can run without blocking the
-        // UI Thread.
-        final Runnable getAndDisplayAddressFromContact =
-                () -> {
+        // Use the Android AsyncTask framework to create a Runnable so
+        // the (potentially) long-duration getAddressFromContact()
+        // method can run without blocking the UI Thread.
+        new AsyncTask<Intent, Void, String> {
+            protected String doInBackground(Intent ...data) {
                     // Extract the address from the contact record
                     // indicated by the Uri associated with the
                     // Intent.
-                    final String address =
-                            getAddressFromContact(data.getData());
+                    return getAddressFromContact(data[0].getData());
+            }
 
-                    runOnUiThread(() -> {
-                        // Launch the activity by sending an
-                        // intent.  Android will choose the right
-                        // one or let the user choose if more than
-                        // one Activity can handle it.
+            protected void onPostExecute(String address) {
+                // Launch the activity by sending an intent.  Android
+                // will choose the right one or let the user choose if
+                // more than one Activity can handle it.
 
-                        // Create an Intent that will launch the
-                        // "Maps" app.
-                        final Intent geoIntent =
-                                makeMapsIntent(address);
+                // Create an Intent that will launch the "Maps" app.
+                final Intent geoIntent =
+                    makeMapsIntent(address);
 
-                        // Check to see if there's a Map app to
-                        // handle the "geo" intent.
-                        if (geoIntent.resolveActivity
-                            (getPackageManager()) != null)
-                            startActivity(geoIntent);
-                        else
-                            // Start the Browser app instead.
-                            startActivity(makeBrowserIntent(address));
-                    });
-                };
-
-        // Create a new Thread to get the address from the contact and
-        // launch the appropriate Activity to display the address.
-        new Thread(getAndDisplayAddressFromContact).start();
-
-        // if you don't want to use a separate Thread just say:
-        // getAndDisplayAddressFromContact.run();
+                // Check to see if there's a Map app to handle the
+                // "geo" intent.
+                if (geoIntent.resolveActivity
+                    (getPackageManager()) != null)
+                    startActivity(geoIntent);
+                else
+                    // Start the Browser app instead.
+                    startActivity(makeBrowserIntent(address));
+            }
+        // Execute the AsyncTask to get the address from the contact
+        // and launch the appropriate Activity to display the address.
+        }.execute(data);
     }
 
     /**
