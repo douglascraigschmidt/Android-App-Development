@@ -7,7 +7,7 @@
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20dp"
-        android:text="Please touch the floating button to add an address"
+        android:text="@string/prompt"
         android:gravity="center"
         android:layout_marginTop="7dp"/>
 
@@ -32,7 +32,7 @@
             android:layout_marginBottom="20dp"
             android:elevation="1dp"
             android:src="@drawable/icon_add"
-            android:onClick="addAddress"/>
+            android:onClick="mapAddress"/>
     </LinearLayout>
 </LinearLayout>
 

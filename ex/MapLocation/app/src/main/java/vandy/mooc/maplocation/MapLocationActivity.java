@@ -20,7 +20,7 @@ import vandy.mooc.maplocation.UiUtils;
  * given by the user.
  */
 public class MapLocationActivity
-        extends LifecycleLoggingActivity {
+       extends LifecycleLoggingActivity {
     /**
      * Debugging tag used by the Android logger.
      */
@@ -32,19 +32,16 @@ public class MapLocationActivity
      */
     private EditText mEditTextReveal;
 
-
     /**
      * Keeps track of whether the EditText is visible.
      */
     private boolean mIsEditTextVisible;
-
 
     /**
      * Holds a reference to the ImageButton that is used as a floating
      * action button.
      */
     private ImageButton mAddButton;
-
 
     /**
      * Hook method called when a new instance of Activity is created.
@@ -73,10 +70,9 @@ public class MapLocationActivity
     }
 
     /**
-     * Called by the Android Activity framework after the user adds an
-     * address to map.
+     * Start the appropriate Activity to map the address.
      */
-    private void showMap() {
+    private void startMap() {
         try {
             // Get the address entered by the user.
             String address = mEditTextReveal.getText().toString();
@@ -92,14 +88,14 @@ public class MapLocationActivity
             // Create an Intent that will launch the "Maps" app.
             final Intent geoIntent = makeMapsIntent(address);
 
-            // Check to see if there's a Map app to handle the "geo"
+            // Check to see if the Maps app exists to handle the "geo"
             // intent.
             if (geoIntent.resolveActivity(getPackageManager()) != null)
+                // Start the Maps app.
                 startActivity(geoIntent);
             else
-                // Start the Browser app instead.
+                // Start the Browser app.
                 startActivity(makeBrowserIntent(address));
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -130,36 +126,40 @@ public class MapLocationActivity
     }
 
     /**
-     * Reveals or hides the EditText as required.
-     * @param view The view
+     * Called by the Android Activity framework after the user adds an
+     * address to map.  
+     *
+     * @param view The view.
      */
-    public void addAddress(View view) {
+    public void mapAddress(View view) {
+        // Used to reveal or hide the EditText as required.
         Animatable mAnimatable;
 
         // Check if the EditText is visible.
         if (mIsEditTextVisible) {
-            // If visible, hide the EditText and set the boolean to false.
+            // If visible, hide the EditText and set the boolean to
+            // false.
             UiUtils.hideEditText(mEditTextReveal);
             mIsEditTextVisible = false;
 
-            // Set Image Resource to start the morph animation of the FAB icon
-            // from the tick mark to +.
+            // Set Image Resource to start the morph animation of the
+            // FAB icon from the tick mark to +.
             mAddButton.setImageResource(R.drawable.icon_morph_reverse);
             mAnimatable = (Animatable) (mAddButton).getDrawable();
             mAnimatable.start();
 
-            // Show the map.
-            showMap();
+            // Start the appropriate map Activity.
+            startMap();
         } else {
-            // If EditText is invisible then reveal it using the animation
-            // and set boolean to true.
+            // If EditText is invisible then reveal it using the
+            // animation and set boolean to true.
             UiUtils.revealEditText(mEditTextReveal);
             mIsEditTextVisible = true;
 
             mEditTextReveal.requestFocus();
 
-            // Set Image Resource to start the morph animation of the FAB icon
-            // from + to the tick mark.
+            // Set Image Resource to start the morph animation of the
+            // FAB icon from + to the tick mark.
             mAddButton.setImageResource(R.drawable.icon_morph);
             mAnimatable = (Animatable) (mAddButton).getDrawable();
             mAnimatable.start();

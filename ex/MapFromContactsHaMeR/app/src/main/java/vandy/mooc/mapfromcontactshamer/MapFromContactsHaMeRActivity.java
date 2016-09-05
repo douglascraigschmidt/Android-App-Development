@@ -70,20 +70,16 @@ public class MapFromContactsHaMeRActivity
      * the "Floating Action Button" on the screen.
      */
     public void findAddress(View v) {
-        try {
-            // Animation that morphs the design of the floating action
-            // button.
-            mAddButton.setImageResource(R.drawable.icon_morph);
-            Animatable mAnimatable =
-                (Animatable) (mAddButton).getDrawable();
-            mAnimatable.start();
+        // Animation that morphs the design of the floating action
+        // button.
+        mAddButton.setImageResource(R.drawable.icon_morph);
+        Animatable mAnimatable =
+            (Animatable) (mAddButton).getDrawable();
+        mAnimatable.start();
 
-            // Start the ContactsContentProvider Activity to get a Uri
-            // for a selected contact.
-            mContactAddressMapper.startContactPicker(PICK_CONTACT_REQUEST);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // Start the ContactsContentProvider Activity to get a Uri
+        // for a selected contact.
+        mContactAddressMapper.startContactPicker(PICK_CONTACT_REQUEST);
     }
 
     /**

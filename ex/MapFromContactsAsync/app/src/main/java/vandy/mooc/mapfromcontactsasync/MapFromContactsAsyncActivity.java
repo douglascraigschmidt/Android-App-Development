@@ -1,15 +1,11 @@
 package vandy.mooc.mapfromcontactsasync;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Animatable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.transition.Slide;
 import android.view.View;
 import android.widget.ImageButton;
@@ -72,19 +68,15 @@ public class MapFromContactsAsyncActivity
      * the "Floating Action Button" on the screen.
      */
     public void findAddress(View v) {
-        try {
-            // Animation that morphs the floating action button.
-            mAddButton.setImageResource(R.drawable.icon_morph);
-            Animatable mAnimatable =
-                (Animatable) (mAddButton).getDrawable();
-            mAnimatable.start();
+        // Animation that morphs the floating action button.
+        mAddButton.setImageResource(R.drawable.icon_morph);
+        Animatable mAnimatable =
+            (Animatable) (mAddButton).getDrawable();
+        mAnimatable.start();
 
-            // Start the ContactsContentProvider Activity to get a Uri
-            // for a selected contact.
-            mContactAddressMapper.startContactPicker(PICK_CONTACT_REQUEST);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // Start the ContactsContentProvider Activity to get a Uri
+        // for a selected contact.
+        mContactAddressMapper.startContactPicker(PICK_CONTACT_REQUEST);
     }
 
     /**
