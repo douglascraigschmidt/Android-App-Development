@@ -9,7 +9,7 @@ import android.util.Log;
  * lifecycle callbacks for logging various lifecycle events.
  */
 public abstract class LifecycleLoggingActivity
-        extends Activity {
+       extends Activity {
     /**
      * Debugging tag used by the Android logger.
      */

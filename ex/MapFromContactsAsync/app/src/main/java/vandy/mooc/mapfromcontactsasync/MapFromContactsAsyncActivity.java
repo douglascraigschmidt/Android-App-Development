@@ -88,15 +88,13 @@ public class MapFromContactsAsyncActivity
     @Override
     protected void onActivityResult(int requestCode,
                                     int resultCode,
-                                    final Intent data) {
+                                    Intent data) {
         // Check if the started Activity completed successfully and
         // the request code is what we're expecting.
         if (resultCode == Activity.RESULT_OK
-            && requestCode == PICK_CONTACT_REQUEST) {
-
+            && requestCode == PICK_CONTACT_REQUEST) 
             // Display a map with the contact data.
             displayMap(data);
-        }
     }
 
     /**

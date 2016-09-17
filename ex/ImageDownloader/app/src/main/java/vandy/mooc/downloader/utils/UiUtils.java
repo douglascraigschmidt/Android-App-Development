@@ -20,7 +20,7 @@ import android.widget.Toast;
 import java.util.Locale;
 
 /**
- * Helper methods shared by various Activities.
+ * This utility class defines static methods shared by various Activities.
  */
 public class UiUtils {
     /**
@@ -30,22 +30,10 @@ public class UiUtils {
         UiUtils.class.getCanonicalName();
 
     /**
-     * Return an uppercase version of the input or null if user gave
-     * no input.  If user gave no input and @a showToast is true a
-     * toast is displayed to this effect.
+     * Ensure this class is only used as a utility.
      */
-    public static String uppercaseInput(Context context, 
-                                        String input,
-                                        boolean showToast) {
-        if (input.isEmpty()) {
-            if (showToast)
-                UiUtils.showToast(context,
-                                  "no input provided");
-            return null;
-        } else
-            // Convert the input entered by the user so it's in
-            // uppercase.
-            return input.toUpperCase(Locale.ENGLISH);
+    private UiUtils() {
+        throw new AssertionError();
     }
 
     /**
@@ -99,14 +87,6 @@ public class UiUtils {
             activity.setResult(Activity.RESULT_OK,
                                new Intent("",
                                           pathToContent));
-    }
-
-    /**
-     * @return True if the caller is running on the UI thread, else
-     * false.
-     */
-    public static boolean runningOnUiThread() {
-        return Thread.currentThread() == Looper.getMainLooper().getThread();
     }
 
     /**
@@ -199,9 +179,29 @@ public class UiUtils {
     }
 
     /**
-     * Ensure this class is only used as a utility.
+     * Return an uppercase version of the input or null if user gave
+     * no input.  If user gave no input and @a showToast is true a
+     * toast is displayed to this effect.
      */
-    private UiUtils() {
-        throw new AssertionError();
-    } 
+    public static String uppercaseInput(Context context,
+                                        String input,
+                                        boolean showToast) {
+        if (input.isEmpty()) {
+            if (showToast)
+                UiUtils.showToast(context,
+                        "no input provided");
+            return null;
+        } else
+            // Convert the input entered by the user so it's in
+            // uppercase.
+            return input.toUpperCase(Locale.ENGLISH);
+    }
+
+    /**
+     * @return True if the caller is running on the UI thread, else
+     * false.
+     */
+    public static boolean runningOnUiThread() {
+        return Thread.currentThread() == Looper.getMainLooper().getThread();
+    }
 }

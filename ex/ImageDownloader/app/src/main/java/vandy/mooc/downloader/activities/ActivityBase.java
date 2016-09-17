@@ -12,7 +12,7 @@ import vandy.mooc.downloader.R;
 import vandy.mooc.downloader.utils.PermissionRequest;
 
 /**
- * Super class that handles permissions.
+ * Super class that handles dynamic Android permissions.
  */
 public class ActivityBase
        extends LifecycleLoggingActivity {

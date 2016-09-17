@@ -7,7 +7,7 @@
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="24dp"
-        android:text="Please touch the floating button to add an address"
+        android:text="@string/hintprompt"
         android:gravity="center"
         android:layout_marginTop="7dp"/>
 

@@ -70,6 +70,47 @@ public class MapLocationActivity
     }
 
     /**
+     * Called by the Android Activity framework after the user adds an
+     * address to map.
+     *
+     * @param view The view.
+     */
+    public void mapAddress(View view) {
+        // Used to reveal or hide the EditText as required.
+        Animatable mAnimatable;
+
+        // Check if the EditText is visible.
+        if (mIsEditTextVisible) {
+            // If visible, hide the EditText and set the boolean to
+            // false.
+            UiUtils.hideEditText(mEditTextReveal);
+            mIsEditTextVisible = false;
+
+            // Set Image Resource to start the morph animation of the
+            // FAB icon from the tick mark to +.
+            mAddButton.setImageResource(R.drawable.icon_morph_reverse);
+            mAnimatable = (Animatable) (mAddButton).getDrawable();
+            mAnimatable.start();
+
+            // Start the appropriate map Activity.
+            startMap();
+        } else {
+            // If EditText is invisible then reveal it using the
+            // animation and set boolean to true.
+            UiUtils.revealEditText(mEditTextReveal);
+            mIsEditTextVisible = true;
+
+            mEditTextReveal.requestFocus();
+
+            // Set Image Resource to start the morph animation of the
+            // FAB icon from + to the tick mark.
+            mAddButton.setImageResource(R.drawable.icon_morph);
+            mAnimatable = (Animatable) (mAddButton).getDrawable();
+            mAnimatable.start();
+        }
+    }
+
+    /**
      * Start the appropriate Activity to map the address.
      */
     private void startMap() {
@@ -123,46 +164,5 @@ public class MapLocationActivity
         return new Intent(Intent.ACTION_VIEW,
                           Uri.parse("http://maps.google.com/?q=" 
                                     + address));
-    }
-
-    /**
-     * Called by the Android Activity framework after the user adds an
-     * address to map.  
-     *
-     * @param view The view.
-     */
-    public void mapAddress(View view) {
-        // Used to reveal or hide the EditText as required.
-        Animatable mAnimatable;
-
-        // Check if the EditText is visible.
-        if (mIsEditTextVisible) {
-            // If visible, hide the EditText and set the boolean to
-            // false.
-            UiUtils.hideEditText(mEditTextReveal);
-            mIsEditTextVisible = false;
-
-            // Set Image Resource to start the morph animation of the
-            // FAB icon from the tick mark to +.
-            mAddButton.setImageResource(R.drawable.icon_morph_reverse);
-            mAnimatable = (Animatable) (mAddButton).getDrawable();
-            mAnimatable.start();
-
-            // Start the appropriate map Activity.
-            startMap();
-        } else {
-            // If EditText is invisible then reveal it using the
-            // animation and set boolean to true.
-            UiUtils.revealEditText(mEditTextReveal);
-            mIsEditTextVisible = true;
-
-            mEditTextReveal.requestFocus();
-
-            // Set Image Resource to start the morph animation of the
-            // FAB icon from + to the tick mark.
-            mAddButton.setImageResource(R.drawable.icon_morph);
-            mAnimatable = (Animatable) (mAddButton).getDrawable();
-            mAnimatable.start();
-        }
     }
 }

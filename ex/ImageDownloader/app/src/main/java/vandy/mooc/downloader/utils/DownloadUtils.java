@@ -19,8 +19,9 @@ import android.util.Base64;
 import android.util.Log;
 
 /**
- * This helper class encapsulates several static methods that are used
- * to download image files.
+ * This utility class defines several static methods that are used
+ * to download image files.  See https://en.wikipedia.org/wiki/Utility_class
+ * for more info.
  */
 public class DownloadUtils {
     /**
@@ -28,12 +29,18 @@ public class DownloadUtils {
      */
     private final static String TAG = 
         DownloadUtils.class.getCanonicalName();
+
+    /**
+     * Ensure this class is only used as a utility.
+     */
+    private DownloadUtils() {
+        throw new AssertionError();
+    }
     
     /**
-     * Download the image located at the provided Internet url using
-     * the URL class, store it on the android file system using a
-     * FileOutputStream, and return the path to the image file on
-     * disk.
+     * Download the image located at the provided Internet url, store it
+     * in external storage on the local device, and return the path to the
+     * image file.
      *
      * @param context	the context in which to write the file.
      * @param url       the web url.
@@ -63,7 +70,17 @@ public class DownloadUtils {
             return null;
         }
     }
-        
+
+    /**
+     * This method checks if we can write image to external storage
+     *
+     * @return true if an image can be written, and false otherwise
+     */
+    private static boolean isExternalStorageWritable() {
+        return Environment.MEDIA_MOUNTED.equals
+                (Environment.getExternalStorageState());
+    }
+
     /**
      * Decode an InputStream into a Bitmap and store it in a file on
      * the device.
@@ -86,21 +103,27 @@ public class DownloadUtils {
         if (imageToSave == null)
             return null;
 
+        // Create a name of a directory in external storage.
         File directory =
             new File(Environment.getExternalStoragePublicDirectory
                      (Environment.DIRECTORY_DCIM)
                      + "/ImageDir");
 
         if (!directory.exists()) {
+            // Create a directory in external storage.
             File newDirectory =
                 new File(directory.getAbsolutePath());
             newDirectory.mkdirs();
         }
 
+        // Make a new temporary file name.
         File file = new File(directory, 
                              getTemporaryFilename(fileName));
         if (file.exists())
+            // Delete the file if it already exists.
             file.delete();
+
+        // Save the image to the output file.
         try (FileOutputStream outputStream =
              new FileOutputStream(file)) {
             imageToSave.compress(Bitmap.CompressFormat.JPEG,
@@ -129,29 +152,21 @@ public class DownloadUtils {
                    file.getName().toLowerCase(Locale.US));
         values.put("_data",
                    absolutePathToImage);
-        
+
+        // Get the content resolver for this context.
         ContentResolver cr = 
             context.getContentResolver();
 
-        // Store the metadata for the image into the Gallery.
+        // Store the metadata for the image into the Gallery content provider.
         cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                   values);
 
         Log.d(TAG,
               "absolute path to image file is " 
               + absolutePathToImage);
-            
-        return Uri.parse(absolutePathToImage);
-    }
 
-    /**
-     * This method checks if we can write image to external storage
-     * 
-     * @return true if an image can be written, and false otherwise
-     */
-    private static boolean isExternalStorageWritable() {
-        return Environment.MEDIA_MOUNTED.equals
-            (Environment.getExternalStorageState());
+        // Return the absolute path of the image file.
+        return Uri.parse(absolutePathToImage);
     }
 
     /**
@@ -171,12 +186,5 @@ public class DownloadUtils {
         //                              Base64.NO_WRAP);
         return Base64.encodeToString(url.getBytes(),
                                      Base64.NO_WRAP);
-    }
-
-    /**
-     * Ensure this class is only used as a utility.
-     */
-    private DownloadUtils() {
-        throw new AssertionError();
     }
 }

@@ -54,12 +54,12 @@ public class MainActivity
         "http://www.dre.vanderbilt.edu/~schmidt/robot.png";
 
     /**
-     * Reference to add floating action button
+     * Reference to the "add" floating action button.
      */
     private FloatingActionButton mAddFab;
 
     /**
-     * Reference to download floating action button
+     * Reference to the "download" floating action button.
      */
     private FloatingActionButton mDownloadFab;
 
@@ -130,6 +130,44 @@ public class MainActivity
     }
 
     /**
+     * Called by the Android Activity framework when the user clicks +
+     * floating action button.
+     * @param view The view
+     */
+    public void addUrl(View view) {
+        // Check whether the EditText is visible to determine
+        // the kind of animations to use.
+        if (mIsEditTextVisible) {
+            // Hide the EditText using circular reveal animation
+            // and set boolean to false.
+            UiUtils.hideEditText(mUrlEditText);
+            mIsEditTextVisible = false;
+
+            // Rotate the FAB from 'X' to '+'.
+            int animRedId = R.anim.fab_rotate_backward;
+
+            // Load and start the animation.
+            mAddFab.startAnimation(AnimationUtils.loadAnimation(this,
+                    animRedId));
+            // Hides the download FAB.
+            UiUtils.hideFab(mDownloadFab);
+        } else {
+            // Hide the EditText using circular reveal animation
+            // and set boolean to true.
+            UiUtils.revealEditText(mUrlEditText);
+            mIsEditTextVisible = true;
+            mUrlEditText.requestFocus();
+
+            // Rotate the FAB from + to 'X'.
+            int animRedId = R.anim.fab_rotate_forward;
+
+            // Load and start the animation.
+            mAddFab.startAnimation(AnimationUtils.loadAnimation(this,
+                    animRedId));
+        }
+    }
+
+    /**
      * Called by the Android Activity framework when the user clicks
      * the "Download Image" button.
      *
@@ -149,6 +187,20 @@ public class MainActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Get the URL to download based on user input.
+     */
+    protected Uri getUrl() {
+        // Get the text the user typed in the edit text (if anything).
+        String userInput = mUrlEditText.getText().toString();
+
+        // If the user didn't provide a URL then use the default.
+        if ("".equals(userInput))
+            userInput = mDefaultUrl;
+
+        return Uri.parse(userInput);
     }
 
     /**
@@ -186,20 +238,6 @@ public class MainActivity
                                        DOWNLOAD_IMAGE_REQUEST);
             }
         }
-    }
-
-    /**
-     * Factory method that returns an implicit Intent for viewing the downloaded
-     * image in the Gallery app.
-     */
-    private Intent makeGalleryIntent(String pathToImageFile) {
-        // Create an intent that will start the Gallery app to view
-        // the image.
-        return UriUtils
-            .buildFileProviderReadUriIntent(this,
-                                            Uri.fromFile(new File(pathToImageFile)),
-                                            Intent.ACTION_VIEW,
-                                            "image/*");
     }
 
     /**
@@ -243,54 +281,16 @@ public class MainActivity
     }
 
     /**
-     * Called by the Android Activity framework when the user clicks +
-     * floating action button.
-     * @param view The view
+     * Factory method that returns an implicit Intent for viewing the downloaded
+     * image in the Gallery app.
      */
-    public void addUrl(View view) {
-        // Check whether the EditText is visible to determine
-        // the kind of animations to use.
-        if (mIsEditTextVisible) {
-            // Hide the EditText using circular reveal animation
-            // and set boolean to false.
-            UiUtils.hideEditText(mUrlEditText);
-            mIsEditTextVisible = false;
-
-            // Rotate the FAB from 'X' to '+'.
-            int animRedId = R.anim.fab_rotate_backward;
-
-            // Load and start the animation.
-            mAddFab.startAnimation(AnimationUtils.loadAnimation(this,
-                                                                animRedId));
-            // Hides the download FAB.
-            UiUtils.hideFab(mDownloadFab);
-        } else {
-            // Hide the EditText using circular reveal animation
-            // and set boolean to true.
-            UiUtils.revealEditText(mUrlEditText);
-            mIsEditTextVisible = true;
-            mUrlEditText.requestFocus();
-
-            // Rotate the FAB from + to 'X'.
-            int animRedId = R.anim.fab_rotate_forward;
-
-            // Load and start the animation.
-            mAddFab.startAnimation(AnimationUtils.loadAnimation(this,
-                                                                animRedId));
-        }
-    }
-
-    /**
-     * Get the URL to download based on user input.
-     */
-    protected Uri getUrl() {
-        // Get the text the user typed in the edit text (if anything).
-        String userInput = mUrlEditText.getText().toString();
-
-        // If the user didn't provide a URL then use the default.
-        if ("".equals(userInput))
-            userInput = mDefaultUrl;
-
-        return Uri.parse(userInput);
+    private Intent makeGalleryIntent(String pathToImageFile) {
+        // Create an intent that will start the Gallery app to view
+        // the image.
+        return UriUtils
+                .buildFileProviderReadUriIntent(this,
+                        Uri.fromFile(new File(pathToImageFile)),
+                        Intent.ACTION_VIEW,
+                        "image/*");
     }
 }

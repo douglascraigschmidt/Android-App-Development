@@ -8,8 +8,9 @@
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
+        android:layout_marginBottom="185dp" />
 
     <TextView
         android:id="@+id/textView1"
@@ -17,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/progressBar_loading"
         android:layout_centerHorizontal="true"
-        android:text="Downloading..."
+        android:text="@string/downloading"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>
