@@ -1,5 +1,6 @@
 package vandy.mooc.downloader.activities;
 
+import android.support.v4.content.LocalBroadcastManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,7 +11,6 @@ import android.widget.ProgressBar;
 
 import vandy.mooc.downloader.R;
 import vandy.mooc.downloader.utils.DownloadUtils;
-import vandy.mooc.downloader.utils.UiUtils;
 
 /**
  * An Activity that Downloads an image, stores it in a local file on
@@ -70,23 +70,20 @@ public class DownloadImageActivity
     }
 
     /**
-     * Hook method called after onCreate() or after onRestart() (when
-     * the activity is being restarted from stopped state).  Should
-     * re-acquire resources relinquished when activity was stopped
-     * (onStop()) or acquire those resources for the first time after
-     * onCreate().
+     * Hook method called after onStart(), just before the activity
+     * (re)gains focus.  
      */
     @Override
-    protected void onStart() {
+    protected void onResume() {
         // Always call super class for necessary
         // initialization/implementation.
-        super.onStart();
+        super.onResume();
 
         // Make progress bar visible.
         mLoadingProgressBar.setVisibility(View.VISIBLE);
         
         Log.d(TAG,
-              "onStart() creating and executing a Thread");
+              "onResume() creating and executing an AsyncTask");
 
         // AsyncTask used to download an image in the background,
         // create an Intent that contains the path to the image file,
@@ -99,6 +96,9 @@ public class DownloadImageActivity
             protected Uri doInBackground(Uri ...url) {
                 // Download the image at the given url and return a Uri
                 // to its location in the local device storage.
+                Log.d(TAG,
+                      "doInBackground() downloading image");
+
                 return DownloadUtils.downloadImage
                         (DownloadImageActivity.this,
                                 url[0]);
@@ -108,11 +108,19 @@ public class DownloadImageActivity
              * This method runs in the UI thread.
              */
             protected void onPostExecute(Uri imagePath) {
-                // Set the result of the Activity.
-                UiUtils.setActivityResult(DownloadImageActivity.this,
-                        imagePath,
-                        "download failed");
+                // Call makeBroadcastIntent to construct an intent
+                // that can be used to broadcast the downloaded image
+                // Uri to a BroadcastReceiver in MainActivity.
+                Intent intent = new Intent(MainActivity.ACTION_VIEW_LOCAL)
+                .putExtra("URI", imagePath.toString());
 
+                // Call the Activity class helper method to send this
+                // intent in a local broadcast to the MainActivity.
+                LocalBroadcastManager.getInstance(DownloadImageActivity.this)
+                                     .sendBroadcast(intent);
+
+                Log.d(TAG,
+                      "onPostExecute() finishing activity");
                 // Stop the Activity from running.
                 DownloadImageActivity.this.finish();
             }
@@ -123,14 +131,14 @@ public class DownloadImageActivity
     }
 
     /**
-     * Hook method called when activity is no longer visible.  Release
-     * resources that may cause a memory leak.
+     * Hook method called when activity is about to lose focus.
+     * Release resources that may cause a memory leak.
      */
     @Override
-    protected void onStop(){
+    protected void onPause(){
         // Always call super class for necessary initialization/
         // implementation.
-        super.onStop();
+        super.onPause();
 
         // Cancel the download.
         mDownloadTask.cancel(true);
