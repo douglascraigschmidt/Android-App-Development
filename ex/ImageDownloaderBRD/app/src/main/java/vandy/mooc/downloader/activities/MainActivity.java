@@ -1,11 +1,13 @@
 package vandy.mooc.downloader.activities;
 
-import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -13,7 +15,6 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.webkit.URLUtil;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import java.io.File;
 
@@ -29,12 +30,21 @@ import vandy.mooc.downloader.utils.UriUtils;
 public class MainActivity
        extends ActivityBase {
     /**
-     * A value that uniquely identifies the request to download an
-     * image.
+     * Action used by this classes broadcast receiver to identify a
+     * recognized broadcast event.
      */
-    private static final int DOWNLOAD_IMAGE_REQUEST = 1;
+    public static final String ACTION_VIEW_LOCAL =
+            "ActionViewLocalBroadcast";
 
     /**
+     * An instance of a local broadcast receiver implementation that
+     * receives a broadcast intent containing a local image Uri and
+     * then displays this image via the Gallery app.
+     */
+    private final BroadcastReceiver mBroadcastReceiver =
+        mBroadcastReceiver = new DownloadReceiver();
+
+   /**
      * EditText field for entering the desired URL to an image.
      */
     private EditText mUrlEditText;
@@ -88,6 +98,95 @@ public class MainActivity
 
         // Initialize the views.
         initializeViews();
+    }
+
+    /**
+     * Registers a broadcast receiver instance that receives a data
+     * intent from the DownloadImageActivity containing the Uri of a
+     * downloaded image to display.
+     */
+    private void registerBroadcastReceiver() {
+        // Create a new broadcast intent filter that will filter and
+        // receive ACTION_VIEW_LOCAL intents.
+        IntentFilter intentFilter =
+            new IntentFilter(ACTION_VIEW_LOCAL);
+
+        // Call the Activity class helper method to register this
+        // local receiver instance.
+        LocalBroadcastManager.getInstance(this)
+                             .registerReceiver(mBroadcastReceiver,
+                                               intentFilter);
+    }
+
+    /**
+     * Target of a broadcast from the ImageDownloadActivity when an
+     * image file has been downloaded successfully.
+     */
+    private class DownloadReceiver
+            extends BroadcastReceiver {
+        /**
+         * Hook method called by the Android ActivityManagerService
+         * framework when a broadcast has been sent.
+         *
+         * @param context The caller's context.
+         * @param data  An intent containing the Uri of the downloaded image.
+         */
+        @Override
+        public void onReceive(Context context,
+                              Intent data) {
+            Log.d(TAG, "onReceive() called.");
+            viewImage(data);
+        }
+
+        /**
+         * Start an activity that will launch the Gallery activity by
+         * passing in the path to the downloaded image file contained
+         * in @a data.
+         *
+         * @param data  An intent containing the Uri of the downloaded image.
+         */
+        private void viewImage(Intent data) {
+            // Call makeGalleryIntent() factory method to create an
+            // intent.
+            Intent intent =
+                makeGalleryIntent(data.getStringExtra("URI"));
+
+            // Allow user to click the download button again.
+            mProcessButtonClick = true;
+
+            // Start the default Android Gallery app image viewer.
+            startActivity(intent);
+        }
+    }
+
+    /**
+     * Hook method called after onStart(), just before the activity
+     * (re)gains focus.  
+     */
+    @Override
+    protected void onResume() {
+        // Always call super class for necessary
+        // initialization/implementation.
+        super.onResume();
+
+        // Call helper method to register a broadcast receiver that
+        // will receive and display the local image.
+        registerBroadcastReceiver();
+    }
+
+    /**
+     * Hook method called when activity is about to lose focus.
+     * Release resources that may cause a memory leak.
+     */
+    @Override
+    protected void onPause(){
+        // Always call super method.
+        super.onPaus();
+
+        // Unregister the broadcast receiver.
+        if (mBroadcastReceiver != null)
+            LocalBroadcastManager.getInstance(this)
+                                  .unregisterReceiver(mBroadcastReceiver);
     }
 
     /**
@@ -147,9 +246,8 @@ public class MainActivity
             int animRedId = R.anim.fab_rotate_backward;
 
             // Load and start the animation.
-            mAddFab.startAnimation
-                (AnimationUtils.loadAnimation(this,
-                                              animRedId));
+            mAddFab.startAnimation(AnimationUtils.loadAnimation(this,
+                    animRedId));
             // Hides the download FAB.
             UiUtils.hideFab(mDownloadFab);
         } else {
@@ -159,7 +257,7 @@ public class MainActivity
             mIsEditTextVisible = true;
             mUrlEditText.requestFocus();
 
-            // Rotate the FAB from '+' to 'X'.
+            // Rotate the FAB from + to 'X'.
             int animRedId = R.anim.fab_rotate_forward;
 
             // Load and start the animation.
@@ -232,50 +330,12 @@ public class MainActivity
                     DownloadImageActivity.makeIntent(url);
 
                 // Start the Activity associated with the Intent,
-                // which will download the image and then return the
-                // Uri for the downloaded image file via the
-                // onActivityResult() hook method.
-                startActivityForResult(intent,
-                                       DOWNLOAD_IMAGE_REQUEST);
-            }
-        }
-    }
-
-    /**
-     * Hook method called back by the Android Activity framework when
-     * an Activity that's been launched exits, giving the requestCode
-     * it was started with, the resultCode it returned, and any
-     * additional data from it.
-     */
-    @Override
-    protected void onActivityResult(int requestCode,
-                                    int resultCode,
-                                    Intent data) {
-        // Check if the started Activity completed successfully.
-        if (resultCode == Activity.RESULT_OK) {
-            // Check if the request code is what we're expecting.
-            if (requestCode == DOWNLOAD_IMAGE_REQUEST) {
-                // Call the makeGalleryIntent() factory method to
-                // create an Intent that will launch the "Gallery" app
-                // by passing in the path to the downloaded image
-                // file.
-                Intent intent =
-                        makeGalleryIntent(data.getDataString());
-
-                // Start the default Android Gallery app image viewer.
+                // which will download the image and then send a
+                // broadcast intent back to MainActivity containing
+                // the Uri for the downloaded image file.
                 startActivity(intent);
             }
         }
-        // Check if the started Activity did not complete successfully
-        // and inform the user a problem occurred when trying to
-        // download contents at the given URL.
-        else if (resultCode == Activity.RESULT_CANCELED)
-            UiUtils.showToast(this,
-                              "failed to download "
-                              + getUrl().toString());
-
-        // Allow user to click the download button again.
-        mProcessButtonClick = true;
     }
 
     /**

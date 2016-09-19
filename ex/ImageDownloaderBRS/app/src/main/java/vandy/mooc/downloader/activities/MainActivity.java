@@ -1,11 +1,13 @@
 package vandy.mooc.downloader.activities;
 
-import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -13,7 +15,6 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.webkit.URLUtil;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import java.io.File;
 
@@ -29,12 +30,13 @@ import vandy.mooc.downloader.utils.UriUtils;
 public class MainActivity
        extends ActivityBase {
     /**
-     * A value that uniquely identifies the request to download an
-     * image.
+     * An instance of a local broadcast receiver implementation that
+     * receives a broadcast intent containing a local image Uri and
+     * then displays this image via the Gallery app.
      */
-    private static final int DOWNLOAD_IMAGE_REQUEST = 1;
+    private BroadcastReceiver mBroadcastReceiver;
 
-    /**
+   /**
      * EditText field for entering the desired URL to an image.
      */
     private EditText mUrlEditText;
@@ -88,6 +90,55 @@ public class MainActivity
 
         // Initialize the views.
         initializeViews();
+    }
+
+    /**
+     * Target of a broadcast from the ImageDownloadActivity when an
+     * image file has been downloaded successfully.
+     */
+    public static class DownloadReceiver
+            extends BroadcastReceiver {
+        /**
+         * Debugging tag used by the Android logger.
+         */
+        protected final String TAG =
+            getClass().getSimpleName();
+
+        /**
+         * Hook method called by the Android ActivityManagerService
+         * framework when a broadcast has been sent.
+         *
+         * @param context The caller's context.
+         * @param data  An intent containing the Uri of the downloaded image.
+         */
+        @Override
+        public void onReceive(Context context,
+                              Intent data) {
+            Log.d(TAG, "onReceive() called.");
+            viewImage(context, data);
+        }
+
+        /**
+         * Start an activity that will launch the Gallery activity by
+         * passing in the path to the downloaded image file contained
+         * in @a data.
+         *
+         * @param data  An intent containing the Uri of the downloaded image.
+         */
+        private void viewImage(Context context,
+                               Intent data) {
+            // Call makeGalleryIntent() factory method to create an
+            // intent.
+            Intent intent =
+                makeGalleryIntent(context,
+                                  data.getStringExtra("URI"));
+
+            // Allow user to click the download button again.
+            // mProcessButtonClick = true;
+
+            // Start the default Android Gallery app image viewer.
+            context.startActivity(intent);
+        }
     }
 
     /**
@@ -232,61 +283,24 @@ public class MainActivity
                     DownloadImageActivity.makeIntent(url);
 
                 // Start the Activity associated with the Intent,
-                // which will download the image and then return the
-                // Uri for the downloaded image file via the
-                // onActivityResult() hook method.
-                startActivityForResult(intent,
-                                       DOWNLOAD_IMAGE_REQUEST);
-            }
-        }
-    }
-
-    /**
-     * Hook method called back by the Android Activity framework when
-     * an Activity that's been launched exits, giving the requestCode
-     * it was started with, the resultCode it returned, and any
-     * additional data from it.
-     */
-    @Override
-    protected void onActivityResult(int requestCode,
-                                    int resultCode,
-                                    Intent data) {
-        // Check if the started Activity completed successfully.
-        if (resultCode == Activity.RESULT_OK) {
-            // Check if the request code is what we're expecting.
-            if (requestCode == DOWNLOAD_IMAGE_REQUEST) {
-                // Call the makeGalleryIntent() factory method to
-                // create an Intent that will launch the "Gallery" app
-                // by passing in the path to the downloaded image
-                // file.
-                Intent intent =
-                        makeGalleryIntent(data.getDataString());
-
-                // Start the default Android Gallery app image viewer.
+                // which will download the image and then send a
+                // broadcast intent back to MainActivity containing
+                // the Uri for the downloaded image file.
                 startActivity(intent);
             }
         }
-        // Check if the started Activity did not complete successfully
-        // and inform the user a problem occurred when trying to
-        // download contents at the given URL.
-        else if (resultCode == Activity.RESULT_CANCELED)
-            UiUtils.showToast(this,
-                              "failed to download "
-                              + getUrl().toString());
-
-        // Allow user to click the download button again.
-        mProcessButtonClick = true;
     }
 
     /**
      * Factory method that returns an implicit Intent for viewing the downloaded
      * image in the Gallery app.
      */
-    private Intent makeGalleryIntent(String pathToImageFile) {
+    private static Intent makeGalleryIntent(Context context,
+                                            String pathToImageFile) {
         // Create an intent that will start the Gallery app to view
         // the image.
         return UriUtils
-                .buildFileProviderReadUriIntent(this,
+                .buildFileProviderReadUriIntent(context,
                         Uri.fromFile(new File(pathToImageFile)),
                         Intent.ACTION_VIEW,
                         "image/*");
