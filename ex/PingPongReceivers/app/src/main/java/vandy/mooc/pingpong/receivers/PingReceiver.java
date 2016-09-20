@@ -61,22 +61,25 @@ public class PingReceiver
         Log.d(TAG, "onReceive() called with count of "
               + count);
 
-        // If we're not done then pop a toast and broadcast a
-        // "pong" intent.
-        if (count <= mMaxCount) {
-            // Inform send that we're "ping'd".
-            UiUtils.showToast(context,
-                              "Ping " + count);
-
-            // Send a "pong" intent.
-            context.sendBroadcast(makePongIntent(count));
-        } else {
+        // If we're done then pop a toast and tell MainActivity we've
+        // stop playing.
+        if (count > mMaxCount) {
             // Inform the user we're done.
             UiUtils.showToast(context,
                               "Finished playing ping/pong");
 
             // Inform the activity we've stopped playing.
             mActivity.stopPlaying();
+        } 
+        // If we're not done then pop a toast and "go async" by
+        // creating a thread and broadcasting a "pong" intent.
+        else {
+            // Inform send that we're "ping'd".
+            UiUtils.showToast(context,
+                              "Ping " + count);
+
+            // Broadcast a "pong" intent with given count.
+            context.sendBroadcast(makePongIntent(count));
         }
     }
 

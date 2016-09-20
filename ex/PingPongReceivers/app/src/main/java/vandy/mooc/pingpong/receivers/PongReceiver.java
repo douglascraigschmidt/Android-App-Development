@@ -29,13 +29,13 @@ public class PongReceiver
      * framework after a broadcast has been sent.
      *
      * @param context The caller's context.
-     * @param data  An intent containing ...
+     * @param pong  An intent containing pong data.
      */
     @Override
     public void onReceive(Context context,
-                          Intent data) {
+                          Intent pong) {
         // Get the count from the PingReceiver.
-        Integer count = data.getIntExtra("COUNT", 0);
+        Integer count = pong.getIntExtra("COUNT", 0);
         Log.d(TAG, "onReceive() called with count of "
               + count);
 
@@ -43,8 +43,18 @@ public class PongReceiver
         UiUtils.showToast(context,
                           "Pong " + count);
 
-        // Broadcast a "ping", incrementing the count by one.
-        context.sendBroadcast(makePingIntent(count + 1));
+        // "Go Async"! (must be "final").
+        final PendingResult result = goAsync();
+
+        // Start a background thread with a lambda that broadcasts the
+        // pong intent (could also use a HandlerThread to amortize
+        // thread creation).
+        new Thread(() -> {
+                // Broadcast a "ping", incrementing the count by one.
+                context.sendBroadcast(makePingIntent(count + 1));
+                if (result != null)
+                    result.finish();
+        }).start();
     }
 
     /**

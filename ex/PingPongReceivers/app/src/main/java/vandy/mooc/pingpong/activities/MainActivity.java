@@ -233,6 +233,19 @@ public class MainActivity
     }
 
     /**
+     * Register the PingReceiver dynamically.
+     */
+    private void registerPingReceiver() {
+        // Create an intent filter for ACTION_VIEW_PING.
+        IntentFilter intentFilter =
+                new IntentFilter(PingReceiver.ACTION_VIEW_PING);
+
+        // Register the receiver and the intent filter.
+        registerReceiver(mPingReceiver,
+                         intentFilter);
+    }
+
+    /**
      * Called by the PingReceiver when "ping/pong" is done.
      */
     public void stopPlaying() {
@@ -241,6 +254,9 @@ public class MainActivity
 
         // Unregister the PingReceiver.
         unregisterReceiver(mPingReceiver);
+
+        // Null out the receiver to avoid later problems.
+        mPingReceiver = null;
     }
 
     /**
@@ -256,18 +272,5 @@ public class MainActivity
         else 
             // Convert the count.
             return Integer.decode(userInput);
-    }
-
-    /**
-     * Register the PingReceiver dynamically.
-     */
-    private void registerPingReceiver() {
-        // Create an intent filter for ACTION_VIEW_PING.
-        IntentFilter intentFilter = 
-            new IntentFilter(PingReceiver.ACTION_VIEW_PING);
-
-        // Register the receiver and the intent filter.
-        registerReceiver(mPingReceiver,
-                         intentFilter);
     }
 }
