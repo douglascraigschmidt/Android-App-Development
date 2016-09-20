@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
 
-	<receiver android:name=".activities.MainActivity$PongReceiver">
+	<receiver android:name=".receivers.PongReceiver">
             <intent-filter>
                 <action android:name="vandy.mooc.action.VIEW_PONG"></action>
             </intent-filter>

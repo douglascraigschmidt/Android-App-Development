@@ -1,27 +1,23 @@
 package vandy.mooc.pingpong.activities;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.IntentFilter;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
-import java.io.File;
-
 import vandy.mooc.pingpong.R;
+import vandy.mooc.pingpong.receivers.PingReceiver;
+import vandy.mooc.pingpong.receivers.PongReceiver;
 import vandy.mooc.pingpong.utils.UiUtils;
 
 /**
- * A main Activity that prompts the user for a count and then plays
- * ping/pong using a statically registered broadcast receiver and
- * dynamically registered broadcast receiver.
+ * MainActivity prompts the user for a count and then plays
+ * "ping/pong" by passing intents between a two broadcast receivers
+ * that are statically and dynamically registered.
  */
 public class MainActivity
        extends LifecycleLoggingActivity {
@@ -43,18 +39,6 @@ public class MainActivity
      * specify otherwise.
      */
     private final static int mDefaultCount = 3;
-
-    /**
-     * Intent sent to the PingReceiver.
-     */
-    private final static String ACTION_VIEW_PING = 
-        "vandy.mooc.action.VIEW_PING";
-
-    /**
-     * Intent sent to the PongReceiver.
-     */
-    private final static String ACTION_VIEW_PONG =
-        "vandy.mooc.action.VIEW_PONG";
 
     /**
      * Dynamically registered broadcast receiver that handles "pings".
@@ -125,121 +109,6 @@ public class MainActivity
         // Unregister the PingReceiver.
         if (mPingReceiver != null)
             unregisterReceiver(mPingReceiver);
-    }
-
-    /**
-     * A broadcast receiver that handles "ping" intents.
-     */
-    public class PingReceiver
-           extends BroadcastReceiver {
-        /**
-         * Number of times to play "ping/pong".
-         */
-        private final int mMaxCount;
-
-        /**
-         * Debugging tag used by the Android logger.
-         */
-        protected final String TAG =
-            getClass().getSimpleName();
-
-        /**
-         * Constructor sets the field.
-         */
-        public PingReceiver(int maxCount) {
-            mMaxCount = maxCount;
-        }
-
-        /**
-         * Hook method called by the Android ActivityManagerService
-         * framework after a broadcast has sent.
-         *
-         * @param context The caller's context.
-         * @param ping  An intent containing ping data.
-         */
-        @Override
-        public void onReceive(Context context,
-                              Intent ping) {
-            // Get the count from the PongReceiver.
-            Integer count = ping.getIntExtra("COUNT", 0);
-
-            Log.d(TAG, "onReceive() called with count of "
-                  + count.intValue());
-
-            // If we're not done then pop a toast and broadcast a
-            // "pong" intent.
-            if (count <= mMaxCount) {
-                // Inform send that we're "ping'd".
-                UiUtils.showToast(context,
-                                  "Ping " + count);
-
-                // Send a "pong" intent.
-                context.sendBroadcast(makePongIntent(count));
-            } else {
-                // Inform the user we're done.
-                UiUtils.showToast(context,
-                                  "Finished playing ping/pong");
-
-                // Allow user input again.
-                MainActivity.mProcessButtonClick = true;
-
-                // Unregister the PingReceiver.
-                unregisterReceiver(mPingReceiver);
-            }
-        }
-
-        /**
-         * Factory method that makes a "pong" intent with the given @a
-         * count as an extra.
-         */
-        public Intent makePongIntent(int count) {
-            return new Intent(ACTION_VIEW_PONG)
-                .putExtra("COUNT", count);
-        }
-    }
-
-    /**
-     * A broadcast receiver that handles "pong" intents.
-     */
-    public static class PongReceiver
-            extends BroadcastReceiver {
-        /**
-         * Debugging tag used by the Android logger.
-         */
-        protected final String TAG =
-            getClass().getSimpleName();
-
-        /**
-         * Hook method called by the Android ActivityManagerService
-         * framework after a broadcast has been sent.
-         *
-         * @param context The caller's context.
-         * @param data  An intent containing ...
-         */
-        @Override
-        public void onReceive(Context context,
-                              Intent data) {
-            // Get the count from the PingReceiver.
-            Integer count = data.getIntExtra("COUNT", 0);
-            Log.d(TAG, "onReceive() called with count of "
-                  + count.intValue());
-
-            // Inform send that we're "pong'd".
-            UiUtils.showToast(context,
-                              "Pong " + count);
-
-            // Broadcast a "ping", incrementing the count by one.
-            context.sendBroadcast(makePingIntent(count + 1));
-        }
-
-        /**
-         * Factory method that makes a "ping" intent with the given @a
-         * count as an extra.
-         */
-        public static Intent makePingIntent(int count) {
-            return new Intent(ACTION_VIEW_PING).
-                putExtra("COUNT", count);
-        }
     }
 
     /**
@@ -347,7 +216,7 @@ public class MainActivity
                     mProcessButtonClick = false;
 
                     // Initialize the PingReceiver.
-                    mPingReceiver = new PingReceiver(count);
+                    mPingReceiver = new PingReceiver(this, count);
 
                     // Dynamically register the PingReceiver.
                     registerPingReceiver();
@@ -355,12 +224,23 @@ public class MainActivity
                     // Create a new "ping" intent with an initial
                     // count of 1 and start playing "ping/pong".
                     mPingReceiver.onReceive(this,
-                                            PongReceiver.makePingIntent(1))
+                                            PongReceiver.makePingIntent(1));
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Called by the PingReceiver when "ping/pong" is done.
+     */
+    public void stopPlaying() {
+        // Allow user input again.
+        mProcessButtonClick = true;
+
+        // Unregister the PingReceiver.
+        unregisterReceiver(mPingReceiver);
     }
 
     /**
@@ -375,7 +255,7 @@ public class MainActivity
             return mDefaultCount;
         else 
             // Convert the count.
-            return Integer.decode(userInput).intValue();
+            return Integer.decode(userInput);
     }
 
     /**
@@ -384,7 +264,7 @@ public class MainActivity
     private void registerPingReceiver() {
         // Create an intent filter for ACTION_VIEW_PING.
         IntentFilter intentFilter = 
-            new IntentFilter(ACTION_VIEW_PING);
+            new IntentFilter(PingReceiver.ACTION_VIEW_PING);
 
         // Register the receiver and the intent filter.
         registerReceiver(mPingReceiver,

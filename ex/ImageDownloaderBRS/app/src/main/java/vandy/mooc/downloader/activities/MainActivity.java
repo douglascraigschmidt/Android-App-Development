@@ -23,9 +23,11 @@ import vandy.mooc.downloader.utils.UiUtils;
 import vandy.mooc.downloader.utils.UriUtils;
 
 /**
- * A main Activity that prompts the user for a URL to an image and
- * then uses Intents and other Activities to download the image and
- * view it.
+ * A MainActivity that prompts the user for a URL to an image and then
+ * uses Intents and other Activities to download the image and view
+ * it.  A statically registered broadcast receive is used to deliver
+ * the Uri for the image from the DownloadImageActivity back to the
+ * MainActivity.
  */
 public class MainActivity
        extends ActivityBase {
