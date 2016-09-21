@@ -42,7 +42,7 @@ public class MainActivity
      * then displays this image via the Gallery app.
      */
     private final BroadcastReceiver mDownloadReceiver =
-        mDownloadReceiver = new DownloadReceiver();
+        new DownloadReceiver();
 
    /**
      * EditText field for entering the desired URL to an image.
