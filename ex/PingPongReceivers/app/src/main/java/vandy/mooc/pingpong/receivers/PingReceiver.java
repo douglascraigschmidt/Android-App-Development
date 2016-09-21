@@ -79,17 +79,20 @@ public class PingReceiver
                               "Ping " + count);
 
             // Broadcast a "pong" intent with given count.
-            context.sendBroadcast(makePongIntent(count));
+            context.sendBroadcast(PongReceiver.makePongIntent(context,
+                                                              count));
         }
     }
 
     /**
-     * Factory method that makes a "pong" intent with the given @a
+     * Factory method that makes a "ping" intent with the given @a
      * count as an extra.
      */
-    public Intent makePongIntent(int count) {
-        return new Intent(PongReceiver.ACTION_VIEW_PONG)
-            .putExtra("COUNT", count);
+    public static Intent makePingIntent(Context context, int count) {
+        return new Intent(PingReceiver.ACTION_VIEW_PING)
+                .putExtra("COUNT", count)
+                // Limit receivers to components in this app's package.
+                .setPackage(context.getPackageName());
     }
 }
 

@@ -223,8 +223,8 @@ public class MainActivity
 
                     // Create a new "ping" intent with an initial
                     // count of 1 and start playing "ping/pong".
-                    mPingReceiver.onReceive(this,
-                                            PongReceiver.makePingIntent(1));
+                    mPingReceiver.onReceive
+                            (this, PingReceiver.makePingIntent(this, 1));
                 }
             }
         } catch (Exception e) {

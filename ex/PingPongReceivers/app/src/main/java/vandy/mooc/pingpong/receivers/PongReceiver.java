@@ -43,7 +43,9 @@ public class PongReceiver
         UiUtils.showToast(context,
                           "Pong " + count);
 
-        // "Go Async"! (must be "final").
+        // "Go Async"! (must be "final").  It's overkill to use
+        // this feature for the PongReceiver - we just do this to
+        // show how it works.
         final PendingResult result = goAsync();
 
         // Start a background thread with a lambda that broadcasts the
@@ -51,19 +53,22 @@ public class PongReceiver
         // thread creation).
         new Thread(() -> {
                 // Broadcast a "ping", incrementing the count by one.
-                context.sendBroadcast(makePingIntent(count + 1));
+                context.sendBroadcast(PingReceiver.makePingIntent(context,
+                                                                  count + 1));
                 if (result != null)
                     result.finish();
         }).start();
     }
 
     /**
-     * Factory method that makes a "ping" intent with the given @a
+     * Factory method that makes a "pong" intent with the given @a
      * count as an extra.
      */
-    public static Intent makePingIntent(int count) {
-        return new Intent(PingReceiver.ACTION_VIEW_PING).
-            putExtra("COUNT", count);
+    public static Intent makePongIntent(Context context, int count) {
+        return new Intent(PongReceiver.ACTION_VIEW_PONG)
+                .putExtra("COUNT", count)
+                // Limit receivers to components in this app's package.
+                .setPackage(context.getPackageName());
     }
 }
 
