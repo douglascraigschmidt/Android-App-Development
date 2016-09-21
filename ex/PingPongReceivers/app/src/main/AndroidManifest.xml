@@ -21,14 +21,13 @@
             </intent-filter>
         </activity>
 
-        <!--  -->
-
         <receiver
-            android:name=".receivers.PongReceiver"
-            android:process=":PongReceiver">
-            <intent-filter>
-               <action android:name="vandy.mooc.action.VIEW_PONG"></action>
-            </intent-filter>
+           android:exported="false" 
+           android:name=".receivers.PongReceiver"
+           android:process=":PongReceiver">
+          <intent-filter>
+            <action android:name="vandy.mooc.action.VIEW_PONG"></action>
+          </intent-filter>
         </receiver>
 
     </application>

@@ -1,8 +1,10 @@
 package vandy.mooc.downloader.activities;
 
+import android.content.SharedPreferences;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.content.Intent;
 import android.net.Uri;
@@ -48,7 +50,7 @@ public class MainActivity
      * processed or not.  Only one download click is processed until a
      * requested image is downloaded and displayed.
      */
-    private boolean mProcessButtonClick = true;
+    private SharedPreferences mProcessButtonClick = null;
 
     /**
      * URL for the image that's downloaded by default if the user
@@ -92,55 +94,12 @@ public class MainActivity
 
         // Initialize the views.
         initializeViews();
-    }
 
-    /**
-     * Target of a broadcast from the ImageDownloadActivity when an
-     * image file has been downloaded successfully.
-     */
-    public static class DownloadReceiver
-            extends BroadcastReceiver {
-        /**
-         * Debugging tag used by the Android logger.
-         */
-        protected final String TAG =
-            getClass().getSimpleName();
-
-        /**
-         * Hook method called by the Android ActivityManagerService
-         * framework when a broadcast has been sent.
-         *
-         * @param context The caller's context.
-         * @param data  An intent containing the Uri of the downloaded image.
-         */
-        @Override
-        public void onReceive(Context context,
-                              Intent data) {
-            Log.d(TAG, "onReceive() called.");
-            viewImage(context, data);
-        }
-
-        /**
-         * Start an activity that will launch the Gallery activity by
-         * passing in the path to the downloaded image file contained
-         * in @a data.
-         *
-         * @param data  An intent containing the Uri of the downloaded image.
-         */
-        private void viewImage(Context context,
-                               Intent data) {
-            // Call makeGalleryIntent() factory method to create an
-            // intent.
-            Intent intent =
-                makeGalleryIntent(context,
-                                  data.getStringExtra("URI"));
-
-            // Allow user to click the download button again.
-            // mProcessButtonClick = true;
-
-            // Start the default Android Gallery app image viewer.
-            context.startActivity(intent);
-        }
+        // Get a SharedPreferences instance that points to the default
+        // file used by the preference framework in this app.
+        mProcessButtonClick = 
+            PreferenceManager.getDefaultSharedPreferences
+            (getApplicationContext());
     }
 
     /**
@@ -267,7 +226,7 @@ public class MainActivity
         // Make sure there's a non-null URL.
         if (url != null) {
             // Make sure that there's not already a download in progress.
-            if (!mProcessButtonClick)
+            if (mProcessButtonClick.getBoolean("buttonClicked", false))
                 UiUtils.showToast(this,
                                   "Already downloading image "
                                   + url);
@@ -278,7 +237,10 @@ public class MainActivity
                                   + url.toString());
             else {
                 // Disable processing of a button click.
-                mProcessButtonClick = false;
+                SharedPreferences.Editor editor =
+                    mProcessButtonClick.edit();
+                editor.putBoolean("buttonClicked", true);
+                editor.commit();
 
                 // Make an intent to download the image.
                 final Intent intent =
@@ -291,20 +253,5 @@ public class MainActivity
                 startActivity(intent);
             }
         }
-    }
-
-    /**
-     * Factory method that returns an implicit Intent for viewing the downloaded
-     * image in the Gallery app.
-     */
-    private static Intent makeGalleryIntent(Context context,
-                                            String pathToImageFile) {
-        // Create an intent that will start the Gallery app to view
-        // the image.
-        return UriUtils
-                .buildFileProviderReadUriIntent(context,
-                        Uri.fromFile(new File(pathToImageFile)),
-                        Intent.ACTION_VIEW,
-                        "image/*");
     }
 }

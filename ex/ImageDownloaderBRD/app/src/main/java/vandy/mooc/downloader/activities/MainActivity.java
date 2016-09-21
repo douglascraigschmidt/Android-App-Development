@@ -24,8 +24,8 @@ import vandy.mooc.downloader.utils.UriUtils;
 
 /**
  * A main Activity that prompts the user for a URL to an image and
- * then uses Intents and other Activities to download the image and
- * view it.
+ * then uses intents and other activities to download the image and a
+ * dynamically registered broadcast receiver view it.
  */
 public class MainActivity
        extends ActivityBase {
@@ -41,8 +41,8 @@ public class MainActivity
      * receives a broadcast intent containing a local image Uri and
      * then displays this image via the Gallery app.
      */
-    private final BroadcastReceiver mBroadcastReceiver =
-        mBroadcastReceiver = new DownloadReceiver();
+    private final BroadcastReceiver mDownloadReceiver =
+        mDownloadReceiver = new DownloadReceiver();
 
    /**
      * EditText field for entering the desired URL to an image.
@@ -114,7 +114,7 @@ public class MainActivity
         // Call the Activity class helper method to register this
         // local receiver instance.
         LocalBroadcastManager.getInstance(this)
-                             .registerReceiver(mBroadcastReceiver,
+                             .registerReceiver(mDownloadReceiver,
                                                intentFilter);
     }
 
@@ -129,13 +129,13 @@ public class MainActivity
          * framework when a broadcast has been sent.
          *
          * @param context The caller's context.
-         * @param data  An intent containing the Uri of the downloaded image.
+         * @param uriData An intent containing the Uri of the downloaded image.
          */
         @Override
-        public void onReceive(Context context,
-                              Intent data) {
+            public void onReceive(Context context,
+                                  Intent uriData) {
             Log.d(TAG, "onReceive() called.");
-            viewImage(data);
+            viewImage(uriData);
         }
 
         /**
@@ -143,19 +143,32 @@ public class MainActivity
          * passing in the path to the downloaded image file contained
          * in @a data.
          *
-         * @param data  An intent containing the Uri of the downloaded image.
+         * @param uriData  An intent containing the Uri of the downloaded image.
          */
-        private void viewImage(Intent data) {
+        private void viewImage(Intent uriData) {
             // Call makeGalleryIntent() factory method to create an
             // intent.
             Intent intent =
-                makeGalleryIntent(data.getStringExtra("URI"));
+                makeGalleryIntent(uriData.getStringExtra("URI"));
 
             // Allow user to click the download button again.
             mProcessButtonClick = true;
 
             // Start the default Android Gallery app image viewer.
             startActivity(intent);
+        }
+
+        /**
+         * Factory method that returns an implicit Intent for viewing
+         * the downloaded image in the Gallery app.
+         */
+        private Intent makeGalleryIntent(String pathToImageFile) {
+            // Create intent that starts Gallery app to view image.
+            return UriUtils.buildFileProviderReadUriIntent
+                (this,
+                 Uri.fromFile(new File(pathToImageFile)),
+                 Intent.ACTION_VIEW,
+                 "image/*");
         }
     }
 
@@ -184,9 +197,9 @@ public class MainActivity
         super.onPaus();
 
         // Unregister the broadcast receiver.
-        if (mBroadcastReceiver != null)
+        if (mDownloadReceiver != null)
             LocalBroadcastManager.getInstance(this)
-                                  .unregisterReceiver(mBroadcastReceiver);
+                                 .unregisterReceiver(mDownloadReceiver);
     }
 
     /**
@@ -336,19 +349,5 @@ public class MainActivity
                 startActivity(intent);
             }
         }
-    }
-
-    /**
-     * Factory method that returns an implicit Intent for viewing the downloaded
-     * image in the Gallery app.
-     */
-    private Intent makeGalleryIntent(String pathToImageFile) {
-        // Create an intent that will start the Gallery app to view
-        // the image.
-        return UriUtils
-                .buildFileProviderReadUriIntent(this,
-                        Uri.fromFile(new File(pathToImageFile)),
-                        Intent.ACTION_VIEW,
-                        "image/*");
     }
 }

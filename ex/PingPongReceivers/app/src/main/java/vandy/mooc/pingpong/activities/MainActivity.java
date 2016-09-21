@@ -46,12 +46,12 @@ public class MainActivity
     private PingReceiver mPingReceiver;
 
     /**
-     * Reference to the "play" floating action button.
+     * Reference to the "set" floating action button.
      */
     private FloatingActionButton mSetFab;
 
     /**
-     * Reference to the "set" floating action button.
+     * Reference to the "play" floating action button.
      */
     private FloatingActionButton mCountFab;
 
@@ -92,6 +92,7 @@ public class MainActivity
         // initialization/implementation.
         super.onResume();
 
+        if (mPingReceiver != null)
         // Call helper method to register a broadcast receiver that
         // will receive "ping" intents.
         registerPingReceiver();
@@ -236,13 +237,15 @@ public class MainActivity
      * Register the PingReceiver dynamically.
      */
     private void registerPingReceiver() {
-        // Create an intent filter for ACTION_VIEW_PING.
-        IntentFilter intentFilter =
-                new IntentFilter(PingReceiver.ACTION_VIEW_PING);
+        if (mPingReceiver == null) {
+            // Create an intent filter for ACTION_VIEW_PING.
+            IntentFilter intentFilter =
+                    new IntentFilter(PingReceiver.ACTION_VIEW_PING);
 
-        // Register the receiver and the intent filter.
-        registerReceiver(mPingReceiver,
-                         intentFilter);
+            // Register the receiver and the intent filter.
+            registerReceiver(mPingReceiver,
+                    intentFilter);
+        }
     }
 
     /**

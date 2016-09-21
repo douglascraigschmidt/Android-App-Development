@@ -21,7 +21,6 @@
             android:windowSoftInputMode="adjustPan" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -47,9 +46,12 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-	<receiver android:name=".activities.MainActivity$DownloadReceiver">
+	<receiver
+        android:name=".receivers.DownloadReceiver"
+        android:exported="false">
             <intent-filter>
-                <action android:name="vandy.mooc.action.DOWNLOAD_COMPLETE"></action>
+                <action android:name="vandy.mooc.action.DOWNLOAD_COMPLETE">
+                </action>
             </intent-filter>
         </receiver>
 
