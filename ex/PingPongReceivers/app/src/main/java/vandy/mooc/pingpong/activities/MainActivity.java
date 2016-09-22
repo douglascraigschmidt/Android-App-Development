@@ -28,22 +28,16 @@ public class MainActivity
     private EditText mCountEditText;
 
     /**
-     * Keeps track of whether a button click from the user is
-     * processed or not.  Only one click is processed until the pings
-     * and pongs are finished.
-     */
-    public static boolean mProcessButtonClick = true;
-
-    /**
      * Number of times to send "ping" and "pong" if the user doesn't
      * specify otherwise.
      */
     private final static int mDefaultCount = 3;
 
     /**
-     * Dynamically registered broadcast receiver that handles "pings".
+     * Keeps track of whether the edit text is visible for the user to
+     * enter a count.
      */
-    private PingReceiver mPingReceiver;
+    private boolean mIsEditTextVisible = false;
 
     /**
      * Reference to the "set" floating action button.
@@ -56,10 +50,16 @@ public class MainActivity
     private FloatingActionButton mCountFab;
 
     /**
-     * Keeps track of whether the edit text is visible for the user to
-     * enter a count.
+     * Keeps track of whether a button click from the user is
+     * processed or not.  Only one click is processed until the pings
+     * and pongs are finished.
      */
-    private boolean mIsEditTextVisible = false;
+    public static boolean mProcessButtonClick = true;
+
+    /**
+     * Dynamically registered broadcast receiver that handles "pings".
+     */
+    private PingReceiver mPingReceiver;
 
     /**
      * Hook method called when a new instance of Activity is

@@ -70,8 +70,6 @@ public class PongReceiver
         // PongReceiver - we just do this to show how it works.
         final PendingResult result = goAsync();
 
-        Log.d(TAG, "goAsync() with result = " + result);
-
         // Create a lambda that broadcasts the pong intent and post it
         // to the sAsyncHandler, which runs it in a background thread.
         sAsyncHandler.post(() -> {
@@ -79,8 +77,6 @@ public class PongReceiver
             context.sendBroadcast(PingReceiver.makePingIntent
                                   (context,
                                    count + 1));
-
-            Log.d(TAG, "finishing with result = " + result);
 
             // Finish the PongReceiver.
             result.finish();
