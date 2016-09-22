@@ -3,6 +3,8 @@ package vandy.mooc.pingpong.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 
 import vandy.mooc.pingpong.utils.UiUtils;
@@ -17,6 +19,27 @@ public class PongReceiver
      */
     protected final String TAG =
         getClass().getSimpleName();
+
+    /**
+     * Handler that processes the broadcasting of ping intents in the
+     * background.
+     */
+    private static Handler sAsyncHandler;
+
+    /**
+     * Static initialize for this class.
+     */
+    static {
+        // Create a HandlerThread to run in the background.
+        HandlerThread thr = new HandlerThread("PongReceiverAsync");
+
+        // Start the HandlerThread.
+        thr.start();
+
+        // Create a Handler that's associated with the HandlerThread's
+        // looper.
+        sAsyncHandler = new Handler(thr.getLooper());
+    }
 
     /**
      * Intent sent to the PongReceiver.
@@ -43,21 +66,21 @@ public class PongReceiver
         UiUtils.showToast(context,
                           "Pong " + count);
 
-        // "Go Async"! (must be "final").  It's overkill to use
-        // this feature for the PongReceiver - we just do this to
-        // show how it works.
+        // "Go Async"!  It's overkill to use this feature for the
+        // PongReceiver - we just do this to show how it works.
         final PendingResult result = goAsync();
 
-        // Start a background thread with a lambda that broadcasts the
-        // pong intent (could also use a HandlerThread to amortize
-        // thread creation).
-        new Thread(() -> {
-                // Broadcast a "ping", incrementing the count by one.
-                context.sendBroadcast(PingReceiver.makePingIntent(context,
-                                                                  count + 1));
-                if (result != null)
-                    result.finish();
-        }).start();
+        // Create a lambda that broadcasts the pong intent and post it
+        // to the sAsyncHandler, which runs it in a background thread.
+        sAsyncHandler.post(() -> {
+            // Broadcast a "ping", incrementing the count by one.
+            context.sendBroadcast(PingReceiver.makePingIntent
+                                  (context,
+                                   count + 1));
+
+            // Finish the PongReceiver.
+            result.finish();
+            });
     }
 
     /**
@@ -66,9 +89,9 @@ public class PongReceiver
      */
     public static Intent makePongIntent(Context context, int count) {
         return new Intent(PongReceiver.ACTION_VIEW_PONG)
-                .putExtra("COUNT", count)
-                // Limit receivers to components in this app's package.
-                .setPackage(context.getPackageName());
+            .putExtra("COUNT", count)
+            // Limit receivers to components in this app's package.
+            .setPackage(context.getPackageName());
     }
 }
 

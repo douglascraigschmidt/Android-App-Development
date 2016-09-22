@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import vandy.mooc.downloader.R;
+import vandy.mooc.downloader.receivers.DownloadReceiver;
 import vandy.mooc.downloader.utils.DownloadUtils;
 
 /**
@@ -23,9 +24,6 @@ public class DownloadImageActivity
      */
     public static String ACTION_DOWNLOAD_IMAGE =
             "vandy.mooc.action.DOWNLOAD_IMAGE";
-
-    public static String ACTION_DOWNLOAD_COMPLETE =
-        "vandy.mooc.action.DOWNLOAD_COMPLETE";
 
     /**
      * Display progress.
@@ -111,15 +109,13 @@ public class DownloadImageActivity
              * This method runs in the UI thread.
              */
             protected void onPostExecute(Uri imagePath) {
-                // Call makeBroadcastIntent to construct an intent
+                // Call the factory method to construct an intent
                 // that can be used to broadcast the downloaded image
-                // Uri to a BroadcastReceiver in MainActivity.
+                // Uri to the DownloadReceiver.
                 Intent intent =
-                    new Intent(ACTION_DOWNLOAD_COMPLETE)
-                               .putExtra("URI",
-                                         imagePath.toString());
+                        DownloadReceiver.makeDownloadCompleteIntent(imagePath);
 
-                // Broadcast this intent to the MainActivity.
+                // Broadcast this intent to the DownloadReceiver.
                 DownloadImageActivity.this.sendBroadcast(intent);
 
                 Log.d(TAG,

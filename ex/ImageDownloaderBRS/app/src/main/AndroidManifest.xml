@@ -46,9 +46,9 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-	<receiver
-        android:name=".receivers.DownloadReceiver"
-        android:exported="false">
+	    <receiver
+            android:name=".receivers.DownloadReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="vandy.mooc.action.DOWNLOAD_COMPLETE">
                 </action>
