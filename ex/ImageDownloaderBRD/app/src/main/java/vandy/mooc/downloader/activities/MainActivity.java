@@ -29,21 +29,6 @@ import vandy.mooc.downloader.utils.UriUtils;
  */
 public class MainActivity
        extends ActivityBase {
-    /**
-     * Action used by this classes broadcast receiver to identify a
-     * recognized broadcast event.
-     */
-    private static final String ACTION_VIEW_LOCAL =
-            "ActionViewLocalBroadcast";
-
-    /**
-     * An instance of a local broadcast receiver implementation that
-     * receives a broadcast intent containing a local image Uri and
-     * then displays this image via the Gallery app.
-     */
-    private final BroadcastReceiver mDownloadReceiver =
-        new DownloadReceiver();
-
    /**
      * EditText field for entering the desired URL to an image.
      */
@@ -78,6 +63,21 @@ public class MainActivity
      * enter a URL.
      */
     private boolean mIsEditTextVisible = false;
+
+    /**
+     * Action used by the LocalBroadcastManger to identify the
+     * DownloadReceiver as the target of a broadcast intent.
+     */
+    private static final String ACTION_VIEW_LOCAL =
+            "ActionViewLocalBroadcast";
+
+    /**
+     * An instance of a local broadcast receiver implementation that
+     * receives a broadcast intent containing a local image Uri and
+     * then triggers the display of this image via the Gallery app.
+     */
+    private final BroadcastReceiver mDownloadReceiver =
+            new DownloadReceiver();
 
     /**
      * Hook method called when a new instance of Activity is
@@ -194,6 +194,42 @@ public class MainActivity
         return new Intent(MainActivity.ACTION_VIEW_LOCAL)
             .putExtra("URI",
                       pathToImageFile.toString());
+    }
+
+    /**
+     * This method is used to create an Intent and then start an
+     * Activity with it.
+     *
+     * @param url The URL for the image to download.
+     */
+    private void startDownloadImageActivity(Uri url) {
+        // Make sure there's a non-null URL.
+        if (url != null) {
+            // Make sure that there's not already a download in progress.
+            if (!mProcessButtonClick)
+                UiUtils.showToast(this,
+                        "Already downloading image "
+                                + url);
+                // Do a sanity check to ensure the URL is valid.
+            else if (!URLUtil.isValidUrl(url.toString()))
+                UiUtils.showToast(this,
+                        "Invalid URL "
+                                + url.toString());
+            else {
+                // Disable processing of a button click.
+                mProcessButtonClick = false;
+
+                // Make an intent to download the image.
+                final Intent intent =
+                        DownloadImageActivity.makeIntent(url);
+
+                // Start the Activity associated with the Intent,
+                // which will download the image and then send a
+                // broadcast intent back to MainActivity containing
+                // the Uri for the downloaded image file.
+                startActivity(intent);
+            }
+        }
     }
 
     /**
@@ -321,41 +357,5 @@ public class MainActivity
             userInput = mDefaultUrl;
 
         return Uri.parse(userInput);
-    }
-
-    /**
-     * This method is used to create an Intent and then start an
-     * Activity with it.
-     *
-     * @param url The URL for the image to download.
-     */
-    private void startDownloadImageActivity(Uri url) {
-        // Make sure there's a non-null URL.
-        if (url != null) {
-            // Make sure that there's not already a download in progress.
-            if (!mProcessButtonClick)
-                UiUtils.showToast(this,
-                                  "Already downloading image "
-                                  + url);
-            // Do a sanity check to ensure the URL is valid.
-            else if (!URLUtil.isValidUrl(url.toString()))
-                UiUtils.showToast(this,
-                                  "Invalid URL "
-                                  + url.toString());
-            else {
-                // Disable processing of a button click.
-                mProcessButtonClick = false;
-
-                // Make an intent to download the image.
-                final Intent intent =
-                    DownloadImageActivity.makeIntent(url);
-
-                // Start the Activity associated with the Intent,
-                // which will download the image and then send a
-                // broadcast intent back to MainActivity containing
-                // the Uri for the downloaded image file.
-                startActivity(intent);
-            }
-        }
     }
 }

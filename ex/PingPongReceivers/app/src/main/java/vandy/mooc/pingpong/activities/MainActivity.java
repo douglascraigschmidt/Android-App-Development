@@ -93,9 +93,9 @@ public class MainActivity
         super.onResume();
 
         if (mPingReceiver != null)
-        // Call helper method to register a broadcast receiver that
-        // will receive "ping" intents.
-        registerPingReceiver();
+            // Call helper method to register a broadcast receiver
+            // that will receive "ping" intents.
+            registerPingReceiver();
     }
 
     /**
@@ -237,15 +237,13 @@ public class MainActivity
      * Register the PingReceiver dynamically.
      */
     private void registerPingReceiver() {
-        if (mPingReceiver == null) {
-            // Create an intent filter for ACTION_VIEW_PING.
-            IntentFilter intentFilter =
-                    new IntentFilter(PingReceiver.ACTION_VIEW_PING);
+        // Create an intent filter for ACTION_VIEW_PING.
+        IntentFilter intentFilter =
+            new IntentFilter(PingReceiver.ACTION_VIEW_PING);
 
-            // Register the receiver and the intent filter.
-            registerReceiver(mPingReceiver,
-                    intentFilter);
-        }
+        // Register the receiver and the intent filter.
+        registerReceiver(mPingReceiver,
+                         intentFilter);
     }
 
     /**

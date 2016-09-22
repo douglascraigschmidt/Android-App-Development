@@ -25,6 +25,12 @@ public class DownloadReceiver
         getClass().getSimpleName();
 
     /**
+     * Name of the Intent Action that indicates the download is complete.
+     */
+    public static String ACTION_DOWNLOAD_COMPLETE =
+            "vandy.mooc.action.DOWNLOAD_COMPLETE";
+
+    /**
      * Hook method called by the Android ActivityManagerService
      * framework when a broadcast has been sent.
      *
@@ -54,17 +60,17 @@ public class DownloadReceiver
             makeGalleryIntent(context,
                               uriData.getStringExtra("URI"));
 
-        SharedPreferences mProcessButtonClick =
-            PreferenceManager.getDefaultSharedPreferences
-                (context.getApplicationContext());
-        // Allow user to click the download button again.
-        SharedPreferences.Editor editor =
-            mProcessButtonClick.edit();
-        editor.putBoolean("buttonClicked", false);
-        editor.commit();
-
         // Start the default Android Gallery app image viewer.
         context.startActivity(intent);
+
+        // Use SharedPreferences to allow user to click the download button again.
+        SharedPreferences mProcessButtonClick =
+                PreferenceManager.getDefaultSharedPreferences
+                        (context.getApplicationContext());
+        SharedPreferences.Editor editor =
+                mProcessButtonClick.edit();
+        editor.putBoolean("buttonClicked", false);
+        editor.commit();
     }
 
     /**
@@ -82,6 +88,18 @@ public class DownloadReceiver
              Uri.fromFile(new File(pathToImageFile)),
              Intent.ACTION_VIEW,
              "image/*");
+    }
+
+    /**
+     * Factory method that returns an implicit intent that
+     * launches the DownloadReceiver.
+     *
+     * @param pathToImageFile The Uri of the downloaded image.
+     */
+    public static Intent makeDownloadCompleteIntent(Uri pathToImageFile) {
+        // Create an implicit intent that launches the DownloadReceiver.
+        return new Intent(DownloadReceiver.ACTION_DOWNLOAD_COMPLETE)
+                .putExtra("URI", pathToImageFile.toString());
     }
 }
 

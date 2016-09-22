@@ -90,9 +90,9 @@ public class PingReceiver
      */
     public static Intent makePingIntent(Context context, int count) {
         return new Intent(PingReceiver.ACTION_VIEW_PING)
-                .putExtra("COUNT", count)
-                // Limit receivers to components in this app's package.
-                .setPackage(context.getPackageName());
+            .putExtra("COUNT", count)
+            // Limit receivers to components in this app's package.
+            .setPackage(context.getPackageName());
     }
 }
 
