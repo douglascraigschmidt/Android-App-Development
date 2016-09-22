@@ -33,7 +33,7 @@ public class MainActivity
      * Action used by this classes broadcast receiver to identify a
      * recognized broadcast event.
      */
-    public static final String ACTION_VIEW_LOCAL =
+    private static final String ACTION_VIEW_LOCAL =
             "ActionViewLocalBroadcast";
 
     /**
@@ -98,6 +98,10 @@ public class MainActivity
 
         // Initialize the views.
         initializeViews();
+
+        // Call helper method to register a broadcast receiver that
+        // will receive and display the local image.
+        registerBroadcastReceiver();
     }
 
     /**
@@ -109,7 +113,7 @@ public class MainActivity
         // Create a new broadcast intent filter that will filter and
         // receive ACTION_VIEW_LOCAL intents.
         IntentFilter intentFilter =
-            new IntentFilter(ACTION_VIEW_LOCAL);
+            new IntentFilter(MainActivity.ACTION_VIEW_LOCAL);
 
         // Call the Activity class helper method to register this
         // local receiver instance.
@@ -132,10 +136,10 @@ public class MainActivity
          * @param uriData An intent containing the Uri of the downloaded image.
          */
         @Override
-            public void onReceive(Context context,
-                                  Intent uriData) {
+        public void onReceive(Context context,
+                              Intent uriData) {
             Log.d(TAG, "onReceive() called.");
-            viewImage(uriData);
+            viewImage(context, uriData);
         }
 
         /**
@@ -143,13 +147,16 @@ public class MainActivity
          * passing in the path to the downloaded image file contained
          * in @a data.
          *
+         * @param context The caller's context.
          * @param uriData  An intent containing the Uri of the downloaded image.
          */
-        private void viewImage(Intent uriData) {
+        private void viewImage(Context context,
+                               Intent uriData) {
             // Call makeGalleryIntent() factory method to create an
             // intent.
             Intent intent =
-                makeGalleryIntent(uriData.getStringExtra("URI"));
+                makeGalleryIntent(context, 
+                                  uriData.getStringExtra("URI"));
 
             // Allow user to click the download button again.
             mProcessButtonClick = true;
@@ -161,11 +168,15 @@ public class MainActivity
         /**
          * Factory method that returns an implicit Intent for viewing
          * the downloaded image in the Gallery app.
+         *
+         * @param context The caller's context.
+         * @param pathToImageFile The Uri of the downloaded image.
          */
-        private Intent makeGalleryIntent(String pathToImageFile) {
+        private Intent makeGalleryIntent(Context context, 
+                                         String pathToImageFile) {
             // Create intent that starts Gallery app to view image.
             return UriUtils.buildFileProviderReadUriIntent
-                (this,
+                (context,
                  Uri.fromFile(new File(pathToImageFile)),
                  Intent.ACTION_VIEW,
                  "image/*");
@@ -173,33 +184,30 @@ public class MainActivity
     }
 
     /**
-     * Hook method called after onStart(), just before the activity
-     * (re)gains focus.  
+     * Factory method to construct an intent that can be used to
+     * broadcast the downloaded image Uri to the DownloadReceiver in
+     * MainActivity.
+     *
+     * @param pathToImageFile The Uri of the downloaded image.
      */
-    @Override
-    protected void onResume() {
-        // Always call super class for necessary
-        // initialization/implementation.
-        super.onResume();
-
-        // Call helper method to register a broadcast receiver that
-        // will receive and display the local image.
-        registerBroadcastReceiver();
+    public static Intent makeDownloadCompleteIntent(Uri pathToImageFile) {
+        return new Intent(MainActivity.ACTION_VIEW_LOCAL)
+            .putExtra("URI",
+                      pathToImageFile.toString());
     }
 
     /**
-     * Hook method called when activity is about to lose focus.
+     * Hook method called when activity is about to be destroyed.
      * Release resources that may cause a memory leak.
      */
     @Override
-    protected void onPause(){
+    protected void onDestroy(){
         // Always call super method.
-        super.onPaus();
+        super.onDestroy();
 
         // Unregister the broadcast receiver.
-        if (mDownloadReceiver != null)
-            LocalBroadcastManager.getInstance(this)
-                                 .unregisterReceiver(mDownloadReceiver);
+        LocalBroadcastManager.getInstance(this)
+                             .unregisterReceiver(mDownloadReceiver);
     }
 
     /**

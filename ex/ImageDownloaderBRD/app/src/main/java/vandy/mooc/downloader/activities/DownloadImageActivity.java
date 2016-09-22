@@ -108,11 +108,11 @@ public class DownloadImageActivity
              * This method runs in the UI thread.
              */
             protected void onPostExecute(Uri imagePath) {
-                // Call makeBroadcastIntent to construct an intent
-                // that can be used to broadcast the downloaded image
-                // Uri to a BroadcastReceiver in MainActivity.
-                Intent intent = new Intent(MainActivity.ACTION_VIEW_LOCAL)
-                .putExtra("URI", imagePath.toString());
+                // Call a factory method to construct an intent that
+                // can be used to broadcast the downloaded image Uri
+                // to the DownloadReceiver in MainActivity.
+                Intent intent =
+                    MainActivity.makeDownloadCompleteIntent(imagePath);
 
                 // Send this intent to the MainActivity via a local
                 // broadcast.

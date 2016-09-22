@@ -70,6 +70,9 @@ public class DownloadReceiver
     /**
      * Factory method that returns an implicit Intent for viewing the
      * downloaded image in the Gallery app.
+     *
+     * @param context The caller's context.
+     * @param pathToImageFile The Uri of the downloaded image.
      */
     private Intent makeGalleryIntent(Context context,
                                      String pathToImageFile) {
