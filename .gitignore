@@ -14,9 +14,11 @@
 *.pydevproject
 .metadata
 .gradle
+.idea
 bin/
 tmp/
 *.tmp
+*.iml
 *.bak
 *.swp
 *~.nib
