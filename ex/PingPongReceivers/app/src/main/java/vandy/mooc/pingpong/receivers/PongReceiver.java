@@ -33,6 +33,15 @@ public class PongReceiver
     private static String NOTIFICATION_ID = "NOTIFICATION_ID";
 
     /**
+     * Sleep delay used to pace the game so that the status bar updates are
+     * visually pleasing.
+     */
+    private static int DELAY = 1000;
+
+    /**
+     * The default status bar
+     */
+    /**
      * Handler that processes the broadcasting of ping intents in the
      * background.
      */
@@ -100,17 +109,18 @@ public class PongReceiver
         sAsyncHandler.post(() -> {
             try {
                 // For a nicer visual effect, perform a short pause before
-                // and after the status bar notification update. The combined
-                // pause of 4 seconds is far less than the 10 second maximum
-                // time allowed for a broadcast receiver's onReceive() call.
-                Thread.sleep(2000);
+                // and after the status bar notification update. Note that the
+                // combined pause of 2 seconds is far less than the 10 second
+                // maximum time allowed for a broadcast receiver's onReceive()
+                // call.
+                Thread.sleep(DELAY);
 
                 // Update status bar to inform that we're "pong'd".
                 Utils.updateStatusBar(context,
                                       mTitle + " " + count,
                                       R.drawable.pong,
                                       notificationId);
-                Thread.sleep(2000);
+                Thread.sleep(DELAY);
             } catch (InterruptedException e) {
                 Log.w(TAG, "Pong broadcast receiver handler was interrupted");
             }

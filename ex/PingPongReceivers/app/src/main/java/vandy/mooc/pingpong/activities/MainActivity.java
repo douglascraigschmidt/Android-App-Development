@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import vandy.mooc.pingpong.R;
 import vandy.mooc.pingpong.receivers.PingReceiver;
-import vandy.mooc.pingpong.utils.Utils;
 import vandy.mooc.pingpong.utils.UiUtils;
 
 /**
@@ -55,24 +54,7 @@ public class MainActivity
     /**
      * Reference to the "play" floating action button.
      */
-    private FloatingActionButton mCountFab;
-
-    /**
-     * The current ping/pong iteration used to resume a paused game.
-     */
-    private int mIteration;
-
-    /**
-     * The total number of iterations to perform.
-     */
-    private int mCount;
-
-    /**
-     * Keeps track of whether a button click from the user is
-     * processed or not.  Only one click is processed until the pings
-     * and pongs are finished.
-     */
-    public static boolean mProcessButtonClick = true;
+    private FloatingActionButton mStartOrStopFab;
 
     /**
      * Dynamically registered broadcast receiver that handles "pings".
@@ -98,11 +80,6 @@ public class MainActivity
 
         // Initialize the views.
         initializeViews();
-
-        if (savedInstanceState != null) {
-            mCount = savedInstanceState.getInt("Count", 0);
-            mIteration = savedInstanceState.getInt("Iteration", 0);
-        }
     }
 
     /**
@@ -119,11 +96,6 @@ public class MainActivity
             // Call helper method to register a broadcast receiver
             // that will receive "ping" intents.
             registerPingReceiver();
-        }
-
-        if (mIteration < mCount) {
-            // Resume a previously paused game.
-            playPingPong(mIteration, mCount);
         }
     }
 
@@ -146,19 +118,6 @@ public class MainActivity
     }
 
     /**
-     * Called to retrieve per-instance state from an activity before being
-     * killed so that the state can be restored in {@link #onCreate} or {@link
-     * #onRestoreInstanceState} (the {@link Bundle} populated by this method
-     * will be passed to both).
-     */
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt("Count", mCount);
-        outState.putInt("Iteration", mIteration);
-        super.onSaveInstanceState(outState);
-    }
-
-    /**
      * Initialize the views.
      */
     private void initializeViews() {
@@ -169,14 +128,14 @@ public class MainActivity
         // Cache floating action button that sets the count.
         mSetFab = (FloatingActionButton) findViewById(R.id.set_fab);
 
-        // Cache floating action button that starts playing ping/pong.
-        mCountFab = (FloatingActionButton) findViewById(R.id.play_fab);
+        // Cache floating action button that starts or stops playing ping/pong.
+        mStartOrStopFab = (FloatingActionButton) findViewById(R.id.play_fab);
 
         // Make the EditText invisible for animation purposes.
         mCountEditText.setVisibility(View.INVISIBLE);
 
         // Make the count button invisible for animation purposes.
-        mCountFab.setVisibility(View.INVISIBLE);
+        mStartOrStopFab.setVisibility(View.INVISIBLE);
 
         // Register a listener to help display "start playing" FAB
         // when the user hits enter.
@@ -188,7 +147,7 @@ public class MainActivity
                     && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                     UiUtils.hideKeyboard(MainActivity.this,
                                          mCountEditText.getWindowToken());
-                    UiUtils.showFab(mCountFab);
+                    UiUtils.showFab(mStartOrStopFab);
                     return true;
                 } else
                     return false;
@@ -217,8 +176,11 @@ public class MainActivity
             mSetFab.startAnimation
                 (AnimationUtils.loadAnimation(this,
                                               animRedId));
-            // Hides the count FAB.
-            UiUtils.hideFab(mCountFab);
+            // Only hide the start/stop FAB if a game is not currently in
+            // progress.
+            if (mPingReceiver == null) {
+                UiUtils.hideFab(mStartOrStopFab);
+            }
         } else {
             // Hide the EditText using circular reveal animation
             // and set boolean to true.
@@ -239,41 +201,31 @@ public class MainActivity
      * Called by the Android Activity framework when the user clicks
      * the "Start Playing" button.
      *
-     * @param view
-     *            The view.
+     * @param view The view.
      */
-    public void startPlaying(View view) {
-        // Hide the keyboard.
-        UiUtils.hideKeyboard(this,
-                             mCountEditText.getWindowToken());
-
-        // Ensure there's not already a game in progress.
-        if (!mProcessButtonClick) {
-            UiUtils.showToast(this,
-                              "Already playing with count of "
-                                      + mCount);
+    public void startOrStopPlaying(View view) {
+        if (mPingReceiver != null) {
+            // The receiver only exists while a game is in progress so .
+            stopPlaying();
         } else {
-            // Get the count from the user.
-            mCount = getCount();
+            // Get the count from the edit view.
+            int count = getCount();
 
             // Make sure there's a non-0 count.
-            if (mCount == 0) {
+            if (count == 0) {
                 Toast.makeText(this,
-                               "Please specify a valid count value",
+                               "Please specify a non-zero count value",
                                Toast.LENGTH_SHORT).show();
             } else {
-                playPingPong(1, mCount);
+                startPlaying(count);
             }
         }
     }
 
-    private void playPingPong(int iteration, int count) {
-        if (!mProcessButtonClick) {
-            throw new IllegalStateException("Already playing ping pong");
-        }
-
-        // Disable processing of a button click.
-        mProcessButtonClick = false;
+    private void startPlaying(int count) {
+        // Hide the keyboard.
+        UiUtils.hideKeyboard(this,
+                             mCountEditText.getWindowToken());
 
         // Initialize the PingReceiver.
         mPingReceiver = new PingReceiver(this, count);
@@ -283,9 +235,12 @@ public class MainActivity
 
         // Create a new "ping" intent with an initial
         // count of 1 and start playing "ping/pong".
-        mPingReceiver.onReceive(
-                this, PingReceiver.makePingIntent(
-                        this, iteration, NOTIFICATION_ID));
+        mPingReceiver.onReceive(this,
+                                PingReceiver.makePingIntent(
+                                        this, 1, NOTIFICATION_ID));
+
+        // Update the start/stop FAB to display a stop icon.
+        mStartOrStopFab.setImageResource(R.drawable.ic_media_stop);
     }
 
     /**
@@ -305,20 +260,18 @@ public class MainActivity
      * Called by the PingReceiver when "ping/pong" is done.
      */
     public void stopPlaying() {
-        // Allow user input again.
-        mProcessButtonClick = true;
+        // Unregister the PingReceiver.
+        unregisterReceiver(mPingReceiver);
 
-        if (mPingReceiver != null) {
-            // Unregister the PingReceiver.
-            unregisterReceiver(mPingReceiver);
-
-            // Null out the receiver to avoid later problems.
-            mPingReceiver = null;
-        }
+        // Null out the receiver to avoid later problems.
+        mPingReceiver = null;
 
         // Cancel the status bar notification.
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
                 .cancel(NOTIFICATION_ID);
+
+        // Reset the start/stop FAB to the play icon.
+        mStartOrStopFab.setImageResource(android.R.drawable.ic_media_play);
     }
 
     /**
