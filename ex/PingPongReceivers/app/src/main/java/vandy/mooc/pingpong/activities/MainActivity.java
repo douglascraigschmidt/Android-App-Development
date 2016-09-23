@@ -1,17 +1,20 @@
 package vandy.mooc.pingpong.activities;
 
+import android.app.NotificationManager;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import vandy.mooc.pingpong.R;
 import vandy.mooc.pingpong.receivers.PingReceiver;
-import vandy.mooc.pingpong.receivers.PongReceiver;
+import vandy.mooc.pingpong.utils.Utils;
 import vandy.mooc.pingpong.utils.UiUtils;
 
 /**
@@ -31,7 +34,12 @@ public class MainActivity
      * Number of times to send "ping" and "pong" if the user doesn't
      * specify otherwise.
      */
-    private final static int mDefaultCount = 3;
+    private final static int DEFAULT_COUNT = 3;
+
+    /**
+     * Status bar notification id that is shared between ping and pong receivers.
+     */
+    private final static int NOTIFICATION_ID = 1;
 
     /**
      * Keeps track of whether the edit text is visible for the user to
@@ -48,6 +56,16 @@ public class MainActivity
      * Reference to the "play" floating action button.
      */
     private FloatingActionButton mCountFab;
+
+    /**
+     * The current ping/pong iteration used to resume a paused game.
+     */
+    private int mIteration;
+
+    /**
+     * The total number of iterations to perform.
+     */
+    private int mCount;
 
     /**
      * Keeps track of whether a button click from the user is
@@ -80,6 +98,11 @@ public class MainActivity
 
         // Initialize the views.
         initializeViews();
+
+        if (savedInstanceState != null) {
+            mCount = savedInstanceState.getInt("Count", 0);
+            mIteration = savedInstanceState.getInt("Iteration", 0);
+        }
     }
 
     /**
@@ -92,10 +115,16 @@ public class MainActivity
         // initialization/implementation.
         super.onResume();
 
-        if (mPingReceiver != null)
+        if (mPingReceiver != null) {
             // Call helper method to register a broadcast receiver
             // that will receive "ping" intents.
             registerPingReceiver();
+        }
+
+        if (mIteration < mCount) {
+            // Resume a previously paused game.
+            playPingPong(mIteration, mCount);
+        }
     }
 
     /**
@@ -110,6 +139,23 @@ public class MainActivity
         // Unregister the PingReceiver.
         if (mPingReceiver != null)
             unregisterReceiver(mPingReceiver);
+
+        // Cancel the status bar notification.
+        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
+                .cancel(NOTIFICATION_ID);
+    }
+
+    /**
+     * Called to retrieve per-instance state from an activity before being
+     * killed so that the state can be restored in {@link #onCreate} or {@link
+     * #onRestoreInstanceState} (the {@link Bundle} populated by this method
+     * will be passed to both).
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("Count", mCount);
+        outState.putInt("Iteration", mIteration);
+        super.onSaveInstanceState(outState);
     }
 
     /**
@@ -197,40 +243,49 @@ public class MainActivity
      *            The view.
      */
     public void startPlaying(View view) {
-        try {
-            // Hide the keyboard.
-            UiUtils.hideKeyboard(this,
-                                 mCountEditText.getWindowToken());
+        // Hide the keyboard.
+        UiUtils.hideKeyboard(this,
+                             mCountEditText.getWindowToken());
 
+        // Ensure there's not already a game in progress.
+        if (!mProcessButtonClick) {
+            UiUtils.showToast(this,
+                              "Already playing with count of "
+                                      + mCount);
+        } else {
             // Get the count from the user.
-            int count = getCount();
+            mCount = getCount();
 
             // Make sure there's a non-0 count.
-            if (count > 0) {
-                // Ensure there's not already a game in progress.
-                if (!mProcessButtonClick)
-                    UiUtils.showToast(this,
-                                      "Already playing with count of "
-                                      + count);
-                else {
-                    // Disable processing of a button click.
-                    mProcessButtonClick = false;
-
-                    // Initialize the PingReceiver.
-                    mPingReceiver = new PingReceiver(this, count);
-
-                    // Dynamically register the PingReceiver.
-                    registerPingReceiver();
-
-                    // Create a new "ping" intent with an initial
-                    // count of 1 and start playing "ping/pong".
-                    mPingReceiver.onReceive
-                            (this, PingReceiver.makePingIntent(this, 1));
-                }
+            if (mCount == 0) {
+                Toast.makeText(this,
+                               "Please specify a valid count value",
+                               Toast.LENGTH_SHORT).show();
+            } else {
+                playPingPong(1, mCount);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+    }
+
+    private void playPingPong(int iteration, int count) {
+        if (!mProcessButtonClick) {
+            throw new IllegalStateException("Already playing ping pong");
+        }
+
+        // Disable processing of a button click.
+        mProcessButtonClick = false;
+
+        // Initialize the PingReceiver.
+        mPingReceiver = new PingReceiver(this, count);
+
+        // Dynamically register the PingReceiver.
+        registerPingReceiver();
+
+        // Create a new "ping" intent with an initial
+        // count of 1 and start playing "ping/pong".
+        mPingReceiver.onReceive(
+                this, PingReceiver.makePingIntent(
+                        this, iteration, NOTIFICATION_ID));
     }
 
     /**
@@ -253,11 +308,17 @@ public class MainActivity
         // Allow user input again.
         mProcessButtonClick = true;
 
-        // Unregister the PingReceiver.
-        unregisterReceiver(mPingReceiver);
+        if (mPingReceiver != null) {
+            // Unregister the PingReceiver.
+            unregisterReceiver(mPingReceiver);
 
-        // Null out the receiver to avoid later problems.
-        mPingReceiver = null;
+            // Null out the receiver to avoid later problems.
+            mPingReceiver = null;
+        }
+
+        // Cancel the status bar notification.
+        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
+                .cancel(NOTIFICATION_ID);
     }
 
     /**
@@ -268,9 +329,9 @@ public class MainActivity
         String userInput = mCountEditText.getText().toString();
 
         // If the user didn't provide a count then use the default.
-        if ("".equals(userInput))
-            return mDefaultCount;
-        else 
+        if (TextUtils.isEmpty(userInput.trim()))
+            return DEFAULT_COUNT;
+        else
             // Convert the count.
             return Integer.decode(userInput);
     }
