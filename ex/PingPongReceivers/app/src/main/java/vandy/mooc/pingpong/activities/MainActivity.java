@@ -137,8 +137,9 @@ public class MainActivity
         // Make the count button invisible for animation purposes.
         mStartOrStopFab.setVisibility(View.INVISIBLE);
 
-        // Register a listener to help display "start playing" FAB
-        // when the user hits enter.
+        // Register a listener to help display "start playing" FAB when the
+        // user hits enter. This listener also sets a default count value
+        // if the user enters no value.
         mCountEditText.setOnEditorActionListener
             ((v, actionId, event) -> {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH
@@ -147,6 +148,9 @@ public class MainActivity
                     && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                     UiUtils.hideKeyboard(MainActivity.this,
                                          mCountEditText.getWindowToken());
+                    if (TextUtils.isEmpty(mCountEditText.getText().toString().trim())) {
+                        mCountEditText.setText(String.valueOf(DEFAULT_COUNT));
+                    }
                     UiUtils.showFab(mStartOrStopFab);
                     return true;
                 } else
@@ -209,7 +213,7 @@ public class MainActivity
             stopPlaying();
         } else {
             // Get the count from the edit view.
-            int count = getCount();
+            int count = Integer.valueOf(mCountEditText.getText().toString());
 
             // Make sure there's a non-0 count.
             if (count == 0) {
@@ -272,20 +276,5 @@ public class MainActivity
 
         // Reset the start/stop FAB to the play icon.
         mStartOrStopFab.setImageResource(android.R.drawable.ic_media_play);
-    }
-
-    /**
-     * Get the count based on user input.
-     */
-    protected int getCount() {
-        // Get the text the user typed in the edit text (if anything).
-        String userInput = mCountEditText.getText().toString();
-
-        // If the user didn't provide a count then use the default.
-        if (TextUtils.isEmpty(userInput.trim()))
-            return DEFAULT_COUNT;
-        else
-            // Convert the count.
-            return Integer.decode(userInput);
     }
 }
