@@ -16,12 +16,6 @@ import vandy.mooc.pingpong.utils.UiUtils;
 public class PongReceiver
         extends BroadcastReceiver {
     /**
-     * Debugging tag used by the Android logger.
-     */
-    protected final String TAG =
-            getClass().getSimpleName();
-
-    /**
      * Intent sent to the PongReceiver.
      */
     public final static String ACTION_VIEW_PONG =
@@ -66,6 +60,12 @@ public class PongReceiver
         // looper.
         sAsyncHandler = new Handler(thr.getLooper());
     }
+
+    /**
+     * Debugging tag used by the Android logger.
+     */
+    protected final String TAG =
+            getClass().getSimpleName();
 
     /**
      * Factory method that makes a "pong" intent with the given @a count and
