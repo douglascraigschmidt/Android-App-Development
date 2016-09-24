@@ -99,12 +99,6 @@ public class MainActivity
                                   R.drawable.idle,
                                   NOTIFICATION_ID);
         }
-
-        /*
-        // Cancel the status bar notification.
-        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
-                .cancel(NOTIFICATION_ID);
-         */
     }
 
     /**
