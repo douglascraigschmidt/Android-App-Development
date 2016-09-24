@@ -15,34 +15,34 @@ import android.widget.Toast;
 import vandy.mooc.pingpong.R;
 import vandy.mooc.pingpong.receivers.PingReceiver;
 import vandy.mooc.pingpong.utils.UiUtils;
+import vandy.mooc.pingpong.utils.Utils;
+
+import static vandy.mooc.pingpong.R.id.count;
 
 /**
- * MainActivity prompts the user for a count and then plays
- * "ping/pong" by passing intents between a two broadcast receivers
- * that are statically and dynamically registered.
+ * MainActivity prompts the user for a count and then plays "ping/pong" by
+ * passing intents between a two broadcast receivers that are statically and
+ * dynamically registered.
  */
 public class MainActivity
-       extends LifecycleLoggingActivity {
-   /**
-     * EditText field for entering the desired count of "pings" and
-     * "pongs".
-     */
-    private EditText mCountEditText;
-
+        extends LifecycleLoggingActivity {
     /**
-     * Number of times to send "ping" and "pong" if the user doesn't
-     * specify otherwise.
+     * Number of times to send "ping" and "pong" if the user doesn't specify
+     * otherwise.
      */
     private final static int DEFAULT_COUNT = 3;
-
     /**
-     * Status bar notification id that is shared between ping and pong receivers.
+     * Status bar notification id that is shared between ping and pong
+     * receivers.
      */
     private final static int NOTIFICATION_ID = 1;
-
     /**
-     * Keeps track of whether the edit text is visible for the user to
-     * enter a count.
+     * EditText field for entering the desired count of "pings" and "pongs".
+     */
+    private EditText mCountEditText;
+    /**
+     * Keeps track of whether the edit text is visible for the user to enter a
+     * count.
      */
     private boolean mIsEditTextVisible = false;
 
@@ -62,12 +62,11 @@ public class MainActivity
     private PingReceiver mPingReceiver;
 
     /**
-     * Hook method called when a new instance of Activity is
-     * created. One time initialization code goes here, e.g., UI
-     * snackbar and some class scope variable initialization.
+     * Hook method called when a new instance of Activity is created. One time
+     * initialization code goes here, e.g., UI snackbar and some class scope
+     * variable initialization.
      *
-     * @param savedInstanceState
-     *            object that contains saved state information.
+     * @param savedInstanceState object that contains saved state information.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,8 +82,34 @@ public class MainActivity
     }
 
     /**
-     * Hook method called after onStart(), just before the activity
-     * (re)gains focus.
+     * Hook method called when activity is about to lose focus. Release
+     * resources that may cause a memory leak.
+     */
+    @Override
+    protected void onPause() {
+        // Always call super method.
+        super.onPause();
+
+        // Unregister the PingReceiver.
+        if (mPingReceiver != null) {
+            unregisterReceiver(mPingReceiver);
+            // Update status bar notification to idle.
+            Utils.updateStatusBar(this,
+                                  "Paused",
+                                  R.drawable.idle,
+                                  NOTIFICATION_ID);
+        }
+
+        /*
+        // Cancel the status bar notification.
+        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
+                .cancel(NOTIFICATION_ID);
+         */
+    }
+
+    /**
+     * Hook method called after onStart(), just before the activity (re)gains
+     * focus.
      */
     @Override
     protected void onResume() {
@@ -96,25 +121,14 @@ public class MainActivity
             // Call helper method to register a broadcast receiver
             // that will receive "ping" intents.
             registerPingReceiver();
+
+            // Resume game from at the last know iteration.
+            mPingReceiver.onReceive(this,
+                                    PingReceiver.makePingIntent(
+                                            this,
+                                            mPingReceiver.getIteration() + 1,
+                                            NOTIFICATION_ID));
         }
-    }
-
-    /**
-     * Hook method called when activity is about to lose focus.
-     * Release resources that may cause a memory leak.
-     */
-    @Override
-    protected void onPause(){
-        // Always call super method.
-        super.onPause();
-
-        // Unregister the PingReceiver.
-        if (mPingReceiver != null)
-            unregisterReceiver(mPingReceiver);
-
-        // Cancel the status bar notification.
-        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
-                .cancel(NOTIFICATION_ID);
     }
 
     /**
@@ -123,7 +137,7 @@ public class MainActivity
     private void initializeViews() {
         // Set the EditText that holds the count entered by the user
         // (if any).
-        mCountEditText = (EditText) findViewById(R.id.count);
+        mCountEditText = (EditText) findViewById(count);
 
         // Cache floating action button that sets the count.
         mSetFab = (FloatingActionButton) findViewById(R.id.set_fab);
@@ -141,26 +155,29 @@ public class MainActivity
         // user hits enter. This listener also sets a default count value
         // if the user enters no value.
         mCountEditText.setOnEditorActionListener
-            ((v, actionId, event) -> {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH
-                    || actionId == EditorInfo.IME_ACTION_DONE
-                    || event.getAction() == KeyEvent.ACTION_DOWN
-                    && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    UiUtils.hideKeyboard(MainActivity.this,
-                                         mCountEditText.getWindowToken());
-                    if (TextUtils.isEmpty(mCountEditText.getText().toString().trim())) {
-                        mCountEditText.setText(String.valueOf(DEFAULT_COUNT));
+                ((v, actionId, event) -> {
+                    if (actionId == EditorInfo.IME_ACTION_SEARCH
+                            || actionId == EditorInfo.IME_ACTION_DONE
+                            || event.getAction() == KeyEvent.ACTION_DOWN
+                            && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                        UiUtils.hideKeyboard(MainActivity.this,
+                                             mCountEditText.getWindowToken());
+                        if (TextUtils.isEmpty(
+                                mCountEditText.getText().toString().trim())) {
+                            mCountEditText.setText(
+                                    String.valueOf(DEFAULT_COUNT));
+                        }
+                        UiUtils.showFab(mStartOrStopFab);
+                        return true;
+                    } else {
+                        return false;
                     }
-                    UiUtils.showFab(mStartOrStopFab);
-                    return true;
-                } else
-                    return false;
-            });
+                });
     }
 
     /**
-     * Called by the Android Activity framework when the user clicks
-     * the '+' floating action button.
+     * Called by the Android Activity framework when the user clicks the '+'
+     * floating action button.
      *
      * @param view The view
      */
@@ -178,8 +195,8 @@ public class MainActivity
 
             // Load and start the animation.
             mSetFab.startAnimation
-                (AnimationUtils.loadAnimation(this,
-                                              animRedId));
+                    (AnimationUtils.loadAnimation(this,
+                                                  animRedId));
             // Only hide the start/stop FAB if a game is not currently in
             // progress.
             if (mPingReceiver == null) {
@@ -202,8 +219,8 @@ public class MainActivity
     }
 
     /**
-     * Called by the Android Activity framework when the user clicks
-     * the "Start Playing" button.
+     * Called by the Android Activity framework when the user clicks the "Start
+     * Playing" button.
      *
      * @param view The view.
      */
@@ -253,7 +270,7 @@ public class MainActivity
     private void registerPingReceiver() {
         // Create an intent filter for ACTION_VIEW_PING.
         IntentFilter intentFilter =
-            new IntentFilter(PingReceiver.ACTION_VIEW_PING);
+                new IntentFilter(PingReceiver.ACTION_VIEW_PING);
 
         // Register the receiver and the intent filter.
         registerReceiver(mPingReceiver,

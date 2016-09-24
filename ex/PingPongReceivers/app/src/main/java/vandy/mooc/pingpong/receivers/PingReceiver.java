@@ -41,6 +41,11 @@ public class PingReceiver
     private final int mMaxCount;
 
     /**
+     * Keeps track of the current iteration to support resuming a paused game.
+     */
+    private int mIteration;
+
+    /**
      * Reference to the enclosing activity so we can call it back when
      * "ping/pong" is done.
      */
@@ -81,7 +86,7 @@ public class PingReceiver
             Context context,
             Intent ping) {
         // Get the count from the PongReceiver.
-        Integer count = ping.getIntExtra(COUNT, 0);
+        Integer count = mIteration = ping.getIntExtra(COUNT, 0);
 
         Log.d(TAG, "onReceive() called with count of "
                 + count);
@@ -114,6 +119,16 @@ public class PingReceiver
                                                 count,
                                                 notificationId));
         }
+    }
+
+    /**
+     * Returns the current iteration which is used as a starting point for
+     * resuming a game that was paused when the application is paused.
+     *
+     * @return The last iteration that was performed.
+     */
+    public int getIteration() {
+        return mIteration;
     }
 }
 
