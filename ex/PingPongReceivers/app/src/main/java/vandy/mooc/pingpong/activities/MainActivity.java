@@ -205,45 +205,50 @@ public class MainActivity
 
     /**
      * Called by the Android Activity framework when the user clicks
-     * the "Start Playing" button.
+     * the "startOrStartPlaying" button.
      *
      * @param view
      *            The view.
      */
-    public void startPlaying(View view) {
+    public void startOrStopPlaying(View view) {
+        if (mPingReceiver != null) {
+            // The receiver only exists while a game is in progress.
+            stopPlaying();
+        } else {
+            // Get the count from the edit view.
+            int count = Integer.valueOf(mCountEditText.getText().toString());
+
+            // Make sure there's a non-0 count.
+            if (count <= 0) {
+                Toast.makeText(this,
+                               "Please specify a count value that's > 0",
+                               Toast.LENGTH_SHORT).show();
+            } else
+                startPlaying(count);
+        }
+
+    /**
+     * Start playing the game for @a count number of "pings" and "pongs".
+     */
+    private void startPlaying(int count) {
         try {
             // Hide the keyboard.
             UiUtils.hideKeyboard(this,
                                  mCountEditText.getWindowToken());
 
-            // Get the count from the user.
-            int count = getCount();
+            // Initialize the PingReceiver.
+            mPingReceiver = new PingReceiver(this, count);
 
-            // Make sure there's a non-0 count.
-            if (count > 0) {
-                // Ensure there's not already a game in progress.
-                if (!mProcessButtonClick)
-                    UiUtils.showToast(this,
-                                      "Already playing with count of "
-                                      + count);
-                else {
-                    // Disable processing of a button click.
-                    mProcessButtonClick = false;
+            // Dynamically register the PingReceiver.
+            registerPingReceiver();
 
-                    // Initialize the PingReceiver.
-                    mPingReceiver = new PingReceiver(this, count);
+            // Create a new "ping" intent with an initial
+            // count of 1 and start playing "ping/pong".
+            mPingReceiver.onReceive
+                (this, PingReceiver.makePingIntent(this, 1));
 
-                    // Dynamically register the PingReceiver.
-                    registerPingReceiver();
-
-                    // Create a new "ping" intent with an initial
-                    // count of 1 and start playing "ping/pong".
-                    mPingReceiver.onReceive
-                            (this, PingReceiver.makePingIntent(this, 1));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            // Update the start/stop FAB to display a stop icon.
+            mStartOrStopFab.setImageResource(R.drawable.ic_media_stop);
         }
     }
 
@@ -272,20 +277,5 @@ public class MainActivity
 
         // Null out the receiver to avoid later problems.
         mPingReceiver = null;
-    }
-
-    /**
-     * Get the count based on user input.
-     */
-    protected int getCount() {
-        // Get the text the user typed in the edit text (if anything).
-        String userInput = mCountEditText.getText().toString();
-
-        // If the user didn't provide a count then use the default.
-        if ("".equals(userInput))
-            return sDEFAULT_COUNT;
-        else 
-            // Convert the count.
-            return Integer.decode(userInput);
     }
 }

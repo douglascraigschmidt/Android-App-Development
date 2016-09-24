@@ -35,7 +35,7 @@
                 android:src="@android:drawable/ic_media_play"
                 android:tint="@android:color/white"
                 android:layout_alignParentLeft="true"
-                android:onClick="startPlaying"/>
+                android:onClick="startOrStopPlaying"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/set_fab"
