@@ -220,36 +220,35 @@ public class MainActivity
 
             // Make sure there's a non-0 count.
             if (count <= 0) {
-                Toast.makeText(this,
-                               "Please specify a count value that's > 0",
-                               Toast.LENGTH_SHORT).show();
+                // Inform the user there's a problem with the input.
+                UiUtils.showToast(this,
+                                  "Please specify a count value that's > 0");
             } else
                 startPlaying(count);
         }
+    }
 
     /**
      * Start playing the game for @a count number of "pings" and "pongs".
      */
     private void startPlaying(int count) {
-        try {
-            // Hide the keyboard.
-            UiUtils.hideKeyboard(this,
-                                 mCountEditText.getWindowToken());
+        // Hide the keyboard.
+        UiUtils.hideKeyboard(this,
+                             mCountEditText.getWindowToken());
 
-            // Initialize the PingReceiver.
-            mPingReceiver = new PingReceiver(this, count);
+        // Initialize the PingReceiver.
+        mPingReceiver = new PingReceiver(this, count);
 
-            // Dynamically register the PingReceiver.
-            registerPingReceiver();
+        // Dynamically register the PingReceiver.
+        registerPingReceiver();
 
-            // Create a new "ping" intent with an initial
-            // count of 1 and start playing "ping/pong".
-            mPingReceiver.onReceive
-                (this, PingReceiver.makePingIntent(this, 1));
+        // Create a new "ping" intent with an initial
+        // count of 1 and start playing "ping/pong".
+        mPingReceiver.onReceive
+            (this, PingReceiver.makePingIntent(this, 1));
 
-            // Update the start/stop FAB to display a stop icon.
-            mStartOrStopFab.setImageResource(R.drawable.ic_media_stop);
-        }
+        // Update the start/stop FAB to display a stop icon.
+        mStartOrStopFab.setImageResource(R.drawable.ic_media_stop);
     }
 
     /**
