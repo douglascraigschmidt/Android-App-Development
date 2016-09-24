@@ -3,6 +3,7 @@ package vandy.mooc.pingpong.activities;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -31,7 +32,7 @@ public class MainActivity
      * Number of times to send "ping" and "pong" if the user doesn't
      * specify otherwise.
      */
-    private final static int mDefaultCount = 3;
+    private final static int sDEFAULT_COUNT = 3;
 
     /**
      * Keeps track of whether the edit text is visible for the user to
@@ -47,7 +48,7 @@ public class MainActivity
     /**
      * Reference to the "play" floating action button.
      */
-    private FloatingActionButton mCountFab;
+    private FloatingActionButton mStartOrStopFab;
 
     /**
      * Keeps track of whether a button click from the user is
@@ -131,13 +132,13 @@ public class MainActivity
         mSetFab = (FloatingActionButton) findViewById(R.id.set_fab);
 
         // Cache floating action button that starts playing ping/pong.
-        mCountFab = (FloatingActionButton) findViewById(R.id.play_fab);
+        mStartOrStopFab = (FloatingActionButton) findViewById(R.id.play_fab);
 
         // Make the EditText invisible for animation purposes.
         mCountEditText.setVisibility(View.INVISIBLE);
 
         // Make the count button invisible for animation purposes.
-        mCountFab.setVisibility(View.INVISIBLE);
+        mStartOrStopFab.setVisibility(View.INVISIBLE);
 
         // Register a listener to help display "start playing" FAB
         // when the user hits enter.  This listener also sets a
@@ -152,7 +153,7 @@ public class MainActivity
                                              mCountEditText.getWindowToken());
                         if (TextUtils.isEmpty
                             (mCountEditText.getText().toString().trim())) 
-                            mCountEditText.setText(String.valueOf(DEFAULT_COUNT));
+                            mCountEditText.setText(String.valueOf(sDEFAULT_COUNT));
 
                         UiUtils.showFab(mStartOrStopFab);
                         return true;
@@ -185,7 +186,7 @@ public class MainActivity
                 (AnimationUtils.loadAnimation(this,
                                               animRedId));
             // Hides the count FAB.
-            UiUtils.hideFab(mCountFab);
+            UiUtils.hideFab(mStartOrStopFab);
         } else {
             // Hide the EditText using circular reveal animation
             // and set boolean to true.
@@ -282,7 +283,7 @@ public class MainActivity
 
         // If the user didn't provide a count then use the default.
         if ("".equals(userInput))
-            return mDefaultCount;
+            return sDEFAULT_COUNT;
         else 
             // Convert the count.
             return Integer.decode(userInput);
