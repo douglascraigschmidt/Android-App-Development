@@ -219,11 +219,15 @@ public class MainActivity
             int count = Integer.valueOf(mCountEditText.getText().toString());
 
             // Make sure there's a non-0 count.
-            if (count <= 0) {
+            if (count <= 0) 
                 // Inform the user there's a problem with the input.
                 UiUtils.showToast(this,
                                   "Please specify a count value that's > 0");
-            } else
+            else if (!mProcessButtonClick)
+                // Inform the user they can't play yet.
+                UiUtils.showToast(this,
+                                  "Game is in progress");
+            else
                 startPlaying(count);
         }
     }
@@ -235,6 +239,9 @@ public class MainActivity
         // Hide the keyboard.
         UiUtils.hideKeyboard(this,
                              mCountEditText.getWindowToken());
+
+        // Allow user input again.
+        mProcessButtonClick = false;
 
         // Initialize the PingReceiver.
         mPingReceiver = new PingReceiver(this, count);
@@ -276,5 +283,8 @@ public class MainActivity
 
         // Null out the receiver to avoid later problems.
         mPingReceiver = null;
+
+        // Reset the start/stop FAB to the play icon.
+        mStartOrStopFab.setImageResource(android.R.drawable.ic_media_play);
     }
 }
