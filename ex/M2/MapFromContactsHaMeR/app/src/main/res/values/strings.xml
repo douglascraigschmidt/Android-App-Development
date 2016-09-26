@@ -2,4 +2,5 @@
     <string name="app_name">MapFromContactsHaMeR</string>
     <string name="findAddress">Find Address</string>
     <string name="prompt">Please touch the floating action button to select a contact</string>
+    <string name="add_button_content_description">Add button</string>
 </resources>

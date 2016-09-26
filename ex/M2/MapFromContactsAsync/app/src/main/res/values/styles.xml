@@ -8,10 +8,6 @@
         <item name="android:colorAccent">@color/accent</item>
         <item name="android:navigationBarColor">@color/primary_dark</item>
         <item name="android:displayOptions">disableHome</item>
-
-        <!--enable window content transitions; not necessary because using Material theme -->
-        <item name="android:windowActivityTransitions">true</item>
-
     </style>
 
 </resources>

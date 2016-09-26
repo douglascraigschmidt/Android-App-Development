@@ -6,7 +6,7 @@
 
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:text="@string/prompt"
         android:gravity="center"
         android:layout_marginTop="7dp"/>
@@ -27,8 +27,11 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="20dp"
             android:elevation="1dp"
+            android:contentDescription="@string/add_button_content_description"
             android:src="@drawable/icon_add"
             android:onClick="findAddress"/>
+
     </LinearLayout>
+
 </LinearLayout>
 
