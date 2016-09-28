@@ -118,10 +118,6 @@ public class MapLocationActivity
             // Get the address entered by the user.
             String address = mEditTextReveal.getText().toString();
 
-            // Replace spaces (' ') with '+' signs to make the browser
-            // happy.
-            address = address.replace(' ', '+');
-
             // Launch the activity by sending an intent.  Android will
             // choose the right one or let the user choose if more
             // than one Activity can handle it.
@@ -151,7 +147,7 @@ public class MapLocationActivity
         // that handle this Intent.
         return new Intent(Intent.ACTION_VIEW,
                           Uri.parse("geo:0,0?q=" 
-                                    + address));
+                                    + Uri.encode(address)));
     }
 
     /**
@@ -161,8 +157,16 @@ public class MapLocationActivity
     private Intent makeBrowserIntent(String address) {
         // Note the "loose coupling" between the Intent and the app(s)
         // that handle this Intent.
-        return new Intent(Intent.ACTION_VIEW,
-                          Uri.parse("http://maps.google.com/?q=" 
-                                    + address));
+
+        // Create the intent.
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+                                   Uri.parse("https://maps.google.com/?q="
+                                                     + Uri.encode(address)));
+
+        // WebView Browser Tester on Emulators without Google APIs will
+        // not remain open unless the activity is started as a new task.
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        return intent;
     }
 }

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -29,6 +30,20 @@ import vandy.mooc.downloader.utils.UriUtils;
  */
 public class MainActivity
        extends ActivityBase {
+    /**
+     * URL for the image that's downloaded by default if the user
+     * doesn't specify otherwise.
+     */
+    private final static String DEFAULT_URL =
+            "http://www.dre.vanderbilt.edu/~schmidt/robot.png";
+
+    /**
+     * Action used by the LocalBroadcastManger to identify the
+     * DownloadReceiver as the target of a broadcast intent.
+     */
+    private static final String ACTION_VIEW_LOCAL =
+            "ActionViewLocalBroadcast";
+
    /**
      * EditText field for entering the desired URL to an image.
      */
@@ -40,13 +55,6 @@ public class MainActivity
      * requested image is downloaded and displayed.
      */
     private boolean mProcessButtonClick = true;
-
-    /**
-     * URL for the image that's downloaded by default if the user
-     * doesn't specify otherwise.
-     */
-    private final static String mDefaultUrl =
-        "http://www.dre.vanderbilt.edu/~schmidt/robot.png";
 
     /**
      * Reference to the "add" floating action button.
@@ -63,13 +71,6 @@ public class MainActivity
      * enter a URL.
      */
     private boolean mIsEditTextVisible = false;
-
-    /**
-     * Action used by the LocalBroadcastManger to identify the
-     * DownloadReceiver as the target of a broadcast intent.
-     */
-    private static final String ACTION_VIEW_LOCAL =
-            "ActionViewLocalBroadcast";
 
     /**
      * An instance of a local broadcast receiver implementation that
@@ -155,7 +156,7 @@ public class MainActivity
             // Call makeGalleryIntent() factory method to create an
             // intent.
             Intent intent =
-                makeGalleryIntent(context, 
+                makeGalleryIntent(context,
                                   uriData.getStringExtra("URI"));
 
             // Allow user to click the download button again.
@@ -172,7 +173,7 @@ public class MainActivity
          * @param context The caller's context.
          * @param pathToImageFile The Uri of the downloaded image.
          */
-        private Intent makeGalleryIntent(Context context, 
+        private Intent makeGalleryIntent(Context context,
                                          String pathToImageFile) {
             // Create intent that starts Gallery app to view image.
             return UriUtils.buildFileProviderReadUriIntent
@@ -278,6 +279,12 @@ public class MainActivity
                     && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                     UiUtils.hideKeyboard(MainActivity.this,
                                          mUrlEditText.getWindowToken());
+                    // Insert default value if no input was specified.
+                    if (TextUtils.isEmpty(
+                            mUrlEditText.getText().toString().trim())) {
+                        mUrlEditText.setText(
+                                String.valueOf(DEFAULT_URL));
+                    }
                     UiUtils.showFab(mDownloadFab);
                     return true;
                 } else
@@ -353,8 +360,8 @@ public class MainActivity
         String userInput = mUrlEditText.getText().toString();
 
         // If the user didn't provide a URL then use the default.
-        if ("".equals(userInput))
-            userInput = mDefaultUrl;
+        if (TextUtils.isEmpty(userInput.trim()))
+            userInput = DEFAULT_URL;
 
         return Uri.parse(userInput);
     }

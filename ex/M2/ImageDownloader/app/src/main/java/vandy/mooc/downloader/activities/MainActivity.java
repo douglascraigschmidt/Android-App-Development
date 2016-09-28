@@ -5,15 +5,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.FileProvider;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.webkit.URLUtil;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import java.io.File;
 
@@ -28,6 +26,13 @@ import vandy.mooc.downloader.utils.UriUtils;
  */
 public class MainActivity
        extends ActivityBase {
+    /**
+     * URL for the image that's downloaded by default if the user
+     * doesn't specify otherwise.
+     */
+    private final static String DEFAULT_URL =
+            "http://www.dre.vanderbilt.edu/~schmidt/robot.png";
+
     /**
      * A value that uniquely identifies the request to download an
      * image.
@@ -45,13 +50,6 @@ public class MainActivity
      * requested image is downloaded and displayed.
      */
     private boolean mProcessButtonClick = true;
-
-    /**
-     * URL for the image that's downloaded by default if the user
-     * doesn't specify otherwise.
-     */
-    private final static String mDefaultUrl =
-        "http://www.dre.vanderbilt.edu/~schmidt/robot.png";
 
     /**
      * Reference to the "add" floating action button.
@@ -122,6 +120,12 @@ public class MainActivity
                     && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                     UiUtils.hideKeyboard(MainActivity.this,
                                          mUrlEditText.getWindowToken());
+                    // Insert default value if no input was specified.
+                    if (TextUtils.isEmpty(
+                            mUrlEditText.getText().toString().trim())) {
+                        mUrlEditText.setText(
+                                String.valueOf(DEFAULT_URL));
+                    }
                     UiUtils.showFab(mDownloadFab);
                     return true;
                 } else
@@ -199,7 +203,7 @@ public class MainActivity
 
         // If the user didn't provide a URL then use the default.
         if ("".equals(userInput))
-            userInput = mDefaultUrl;
+            userInput = DEFAULT_URL;
 
         return Uri.parse(userInput);
     }
