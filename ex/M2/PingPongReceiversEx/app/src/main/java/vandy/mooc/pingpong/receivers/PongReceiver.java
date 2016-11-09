@@ -44,9 +44,6 @@ public class PongReceiver
     private static int DELAY = 1000;
 
     /**
-     * The default status bar
-     */
-    /**
      * Handler that processes the broadcasting of ping intents in the
      * background.
      */

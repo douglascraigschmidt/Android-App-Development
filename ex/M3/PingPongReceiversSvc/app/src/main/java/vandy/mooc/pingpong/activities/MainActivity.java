@@ -12,15 +12,15 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 import vandy.mooc.pingpong.R;
-import vandy.mooc.pingpong.receivers.PingReceiver;
+import vandy.mooc.pingpong.receiver.PingReceiver;
 import vandy.mooc.pingpong.utils.UiUtils;
 
 import static vandy.mooc.pingpong.R.id.count;
 
 /**
  * MainActivity prompts the user for a count and then plays
- * "ping/pong" by passing intents between a two broadcast receivers
- * that are statically and dynamically registered.
+ * "ping/pong" by passing intents between a started service and a
+ * broadcast receiver that is dynamically registered.
  */
 public class MainActivity
         extends LifecycleLoggingActivity {
@@ -53,8 +53,8 @@ public class MainActivity
     private FloatingActionButton mStartOrStopFab;
 
     /**
-     * Status bar notification id that is shared between ping and pong
-     * receivers.
+     * Status bar notification id that is shared between the ping
+     * receiver and the pong service.
      */
     private final static int NOTIFICATION_ID = 1;
 

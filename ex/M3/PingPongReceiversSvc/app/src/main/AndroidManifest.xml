@@ -21,14 +21,10 @@
             </intent-filter>
         </activity>
 
-        <receiver 
-           android:name=".receivers.PongReceiver"
-           android:process=":PongReceiver"
+        <service 
+           android:name=".service.PongService"
            android:exported="false">
-          <intent-filter>
-            <action android:name="vandy.mooc.action.VIEW_PONG"></action>
-          </intent-filter>
-        </receiver>
+        </service>
 
     </application>
 

@@ -1,4 +1,4 @@
-package vandy.mooc.pingpong.receivers;
+package vandy.mooc.pingpong.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.util.Log;
 
 import vandy.mooc.pingpong.R;
 import vandy.mooc.pingpong.activities.MainActivity;
+import vandy.mooc.pingpong.service.PongService;
 import vandy.mooc.pingpong.utils.UiUtils;
 
 /**
@@ -121,10 +122,11 @@ public class PingReceiver
                                     R.drawable.ping,
                                     notificationId);
 
-            // Broadcast a "pong" intent with given count.
-            context.sendBroadcast(PongReceiver.makePongIntent(context,
-                                                              count,
-                                                              notificationId));
+            // Send a "pong" intent with given count to the
+            // PongService.
+            context.startService(PongService.makePongIntent(context,
+                                                            count,
+                                                            notificationId));
         }
     }
 

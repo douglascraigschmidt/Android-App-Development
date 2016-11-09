@@ -25,12 +25,6 @@ public class MusicService extends Service
     private final String TAG = getClass().getSimpleName();
 
     /**
-     * Intent used to start the Service.
-     */
-    private final static String ACTION_PLAY =
-        "course.examples.action.PLAY";
-
-    /**
      * Keep track of whether a song is currently playing.
      */
     private static boolean mSongPlaying;
@@ -41,17 +35,17 @@ public class MusicService extends Service
     private MediaPlayer mPlayer;
 
     /**
-     * This factory method returns an intent used to play and stop
-     * playing a song, which is designated by the @a songURL.
+     * This factory method returns an explicit intent used to play and
+     * stop playing a song, which is designated by the @a songURL.
      */
     public static Intent makeIntent(final Context context,
                                     Uri songURL) {
-        // Create and return an intent that points to the
+        // Create and return an explicit intent that will start the
         // MusicService.
-        return new Intent(ACTION_PLAY,
-                          songURL,
-                          context,
-                          MusicService.class);
+        return new Intent(context,
+                          MusicService.class)
+            .setData(songURL);
+
     }
 
     /**
@@ -78,9 +72,9 @@ public class MusicService extends Service
      * Intent associated with this MusicService.
      */
     @Override
-    public int onStartCommand (Intent intent,
-                               int flags,
-                               int startid) {
+    public int onStartCommand(Intent intent,
+                              int flags,
+                              int startid) {
         // Extract the URL for the song to play.
         final String songURL = intent.getDataString();
 
