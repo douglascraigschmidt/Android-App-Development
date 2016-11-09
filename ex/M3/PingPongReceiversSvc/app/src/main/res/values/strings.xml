@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">PingPongReceiversEx</string>
+    <string name="hintprompt">Please touch the floating action button to set the count</string>
+    <string name="enter_count">Enter count (or return for default)</string>
+    <string name="ok_button">OK</string>
+
+</resources>
