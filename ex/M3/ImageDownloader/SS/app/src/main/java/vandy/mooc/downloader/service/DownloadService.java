@@ -53,6 +53,23 @@ public class DownloadService
     private volatile ServiceHandler mServiceHandler;
 
     /**
+     * Factory method to make the desired Intent.
+     */
+    public static Intent makeIntent(Context context,
+                                    Uri url,
+                                    Handler downloadHandler) {
+        // Create an intent associated with the DownloadService class.
+        return new Intent(context,
+                          DownloadService.class)
+            // Set the URI as data in the Intent.
+            .setData(url)
+            // Create and pass a Messenger as an "extra" so the
+            // DownloadService can send back the pathname.
+            .putExtra(MESSENGER,
+                      new Messenger(downloadHandler));
+    }
+
+    /**
      * Hook method called when DownloadService is first launched by
      * the Android ActivityManager.
      */
@@ -95,42 +112,6 @@ public class DownloadService
     }
 
     /**
-     * Helper method that returns pathname if download succeeded.
-     */
-    public static String getPathname(Message message) {
-        // Extract the data from Message, which is in the form
-        // of a Bundle that can be passed across processes.
-        Bundle data = message.getData();
-
-        // Extract the pathname from the Bundle.
-        String pathname = data.getString(PATHNAME);
-
-        // Check to see if the download succeeded.
-        if (message.arg1 != Activity.RESULT_OK 
-            || pathname == null)
-            return null;
-        else
-            return pathname;
-    }
-
-    /**
-     * Factory method to make the desired Intent.
-     */
-    public static Intent makeIntent(Context context,
-                                    Uri url,
-                                    Handler downloadHandler) {
-        // Create an intent associated with the DownloadService class.
-        return new Intent(context,
-                          DownloadService.class)
-            // Set the URI as data in the Intent.
-            .setData(url)
-            // Create and pass a Messenger as an "extra" so the
-            // DownloadService can send back the pathname.
-            .putExtra(MESSENGER,
-                      new Messenger(downloadHandler));
-    }
-
-    /**
      * An inner class that inherits from Handler and uses its
      * handleMessage() hook method to process Messages sent to it from
      * onStartCommnand() that indicate which images to download.
@@ -163,20 +144,44 @@ public class DownloadService
         }
 
         /**
-         * Retrieves the designated image and reply to the
-         * DownloadActivity via the Messenger sent with the Intent.
+         * Hook method that retrieves an image from a remote server.
+         * and replies to the DownloadActivity via the Messenger sent
+         * with the Intent.
          */
-        private void downloadImageAndReply(Intent intent) {
+        public void handleMessage(Message message) {
             // Download the image at the given url
             Uri uri = DownloadUtils.downloadImage(DownloadService.this,
                                                   intent.getData());
 
+            // Send the pathname via the messenger in the intent.
+            sendPath(intent, uri);
+            
+            // Stop the Service using the startId, so it doesn't stop
+            // in the middle of handling another download request.
+            stopSelf(message.arg1);
+        }
+
+        /**
+         * Send the @a pathname back to the DownloadActivity via the
+         * messenger in the @a intent.
+         */
+        private void sendPath(Intent intent,
+                              Uri pathname) {
             // Extract the Messenger.
             Messenger messenger = (Messenger)
                     intent.getExtras().get(MESSENGER);
 
-            // Send the pathname via the messenger.
-            sendPath(messenger, uri);
+            // Call factory method to create Message.
+            Message message = makeReplyMessage(pathname);
+        
+            try {
+                // Send pathname to back to the DownloadActivity.
+                messenger.send(message);
+            } catch (RemoteException e) {
+                Log.e(getClass().getName(),
+                      "Exception while sending.",
+                      e);
+            }
         }
 
         /**
@@ -200,41 +205,27 @@ public class DownloadService
 
             return message;
         }
-
-        /**
-         * Send the pathname back to the DownloadActivity via the
-         * messenger.
-         */
-        private void sendPath(Messenger messenger, 
-                              Uri pathname) {
-            // Call factory method to create Message.
-            Message message = makeReplyMessage(pathname);
-        
-            try {
-                // Send pathname to back to the DownloadActivity.
-                messenger.send(message);
-            } catch (RemoteException e) {
-                Log.e(getClass().getName(),
-                      "Exception while sending.",
-                      e);
-            }
-        }
-
-        /**
-         * Hook method that retrieves an image from a remote server.
-         */
-        public void handleMessage(Message message) {
-            // Download the designated image and reply to the
-            // DownloadActivity via the Messenger sent with the
-            // Intent.
-            downloadImageAndReply((Intent) message.obj);
-            
-            // Stop the Service using the startId, so it doesn't stop
-            // in the middle of handling another download request.
-            stopSelf(message.arg1);
-        }
     }
     
+    /**
+     * Helper method that returns pathname if download succeeded.
+     */
+    public static String getPathname(Message message) {
+        // Extract the data from Message, which is in the form
+        // of a Bundle that can be passed across processes.
+        Bundle data = message.getData();
+
+        // Extract the pathname from the Bundle.
+        String pathname = data.getString(PATHNAME);
+
+        // Check to see if the download succeeded.
+        if (message.arg1 != Activity.RESULT_OK 
+            || pathname == null)
+            return null;
+        else
+            return pathname;
+    }
+
     /**
      * Hook method called back to shutdown the Looper.
      */

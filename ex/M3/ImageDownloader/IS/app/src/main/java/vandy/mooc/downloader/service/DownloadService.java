@@ -43,44 +43,6 @@ public class DownloadService
     }
 
     /**
-     * Hook method called each time the DownloadService is sent an
-     * Intent via startService() to retrieve the designated image and
-     * reply to the DownloadActivity via the Messenger sent with the
-     * Intent.
-     */
-    public void onHandleIntent(Intent intent) {
-        // Download the image at the given url
-        Uri uri = DownloadUtils.downloadImage(DownloadService.this,
-                                              intent.getData());
-
-        // Extract the Messenger.
-        Messenger messenger = (Messenger)
-            intent.getExtras().get(MESSENGER);
-
-        // Send the pathname via the messenger.
-        sendPath(messenger, uri);
-    }
-
-    /**
-     * Helper method that returns pathname if download succeeded.
-     */
-    public static String getPathname(Message message) {
-        // Extract the data from Message, which is in the form
-        // of a Bundle that can be passed across processes.
-        Bundle data = message.getData();
-
-        // Extract the pathname from the Bundle.
-        String pathname = data.getString(PATHNAME);
-
-        // Check to see if the download succeeded.
-        if (message.arg1 != Activity.RESULT_OK 
-            || pathname == null)
-            return null;
-        else
-            return pathname;
-    }
-
-    /**
      * Factory method to make the desired Intent.
      */
     public static Intent makeIntent(Context context,
@@ -95,6 +57,45 @@ public class DownloadService
             // DownloadService can send back the pathname.
             .putExtra(MESSENGER,
                       new Messenger(downloadHandler));
+    }
+
+    /**
+     * Hook method called each time the DownloadService is sent an
+     * Intent via startService() to retrieve the designated image and
+     * reply to the DownloadActivity via the Messenger sent with the
+     * Intent.
+     */
+    public void onHandleIntent(Intent intent) {
+        // Download the image at the given url
+        Uri uri = DownloadUtils.downloadImage
+            (this,
+             intent.getData());
+
+        // Send the pathname back to DownloadActivity.
+        sendPath(intent, uri);
+    }
+
+    /**
+     * Send the @a pathname back to the DownloadActivity via the
+     * messenger that's stored in the @a intent.
+     */
+    private void sendPath(Intent intent,
+                          Uri pathname) {
+        // Extract the Messenger.
+        Messenger messenger = (Messenger)
+            intent.getExtras().get(MESSENGER);
+
+        // Call factory method to create Message.
+        Message message = makeReplyMessage(pathname);
+        
+        try {
+            // Send pathname to back to the DownloadActivity.
+            messenger.send(message);
+        } catch (RemoteException e) {
+            Log.e(getClass().getName(),
+                  "Exception while sending.",
+                  e);
+        }
     }
 
     /**
@@ -120,21 +121,21 @@ public class DownloadService
     }
 
     /**
-     * Send the pathname back to the DownloadActivity via the
-     * messenger.
+     * Helper method that returns pathname if download succeeded.
      */
-    private void sendPath(Messenger messenger, 
-                          Uri pathname) {
-        // Call factory method to create Message.
-        Message message = makeReplyMessage(pathname);
-        
-        try {
-            // Send pathname to back to the DownloadActivity.
-            messenger.send(message);
-        } catch (RemoteException e) {
-            Log.e(getClass().getName(),
-                  "Exception while sending.",
-                  e);
-        }
+    public static String getPathname(Message message) {
+        // Extract the data from Message, which is in the form
+        // of a Bundle that can be passed across processes.
+        Bundle data = message.getData();
+
+        // Extract the pathname from the Bundle.
+        String pathname = data.getString(PATHNAME);
+
+        // Check to see if the download succeeded.
+        if (message.arg1 != Activity.RESULT_OK 
+            || pathname == null)
+            return null;
+        else
+            return pathname;
     }
 }
