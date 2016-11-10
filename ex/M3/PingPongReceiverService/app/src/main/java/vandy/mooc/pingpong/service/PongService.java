@@ -60,8 +60,8 @@ public class PongService
      */
     @Override
     public int onStartCommand(Intent intent,
-                               int flags,
-                               int startid) {
+                              int flags,
+                              int startid) {
         // Get the count from the PingReceiver.
         Integer count = intent.getIntExtra(COUNT, 0);
         Log.d(TAG, "onStartCommand() called with count of "

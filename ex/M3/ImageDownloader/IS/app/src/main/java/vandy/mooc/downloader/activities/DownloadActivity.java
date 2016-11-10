@@ -24,11 +24,10 @@ import vandy.mooc.downloader.utils.UiUtils;
 import vandy.mooc.downloader.utils.UriUtils;
 
 /**
- * A main Activity that prompts the user for a URL to an image and
- * then uses Intents and other Activities to download the image and
- * view it.
+ * This activity prompts the user for a URL to an image and then uses
+ * intents and the IntentService to download the image and view it.
  */
-public class MainActivity
+public class DownloadActivity
        extends ActivityBase {
     /**
      * URL for the image that's downloaded by default if the user
@@ -131,7 +130,7 @@ public class MainActivity
                     || actionId == EditorInfo.IME_ACTION_DONE
                     || event.getAction() == KeyEvent.ACTION_DOWN
                     && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    UiUtils.hideKeyboard(MainActivity.this,
+                    UiUtils.hideKeyboard(DownloadActivity.this,
                                          mUrlEditText.getWindowToken());
                     // Insert default value if no input was specified.
                     if (TextUtils.isEmpty(
@@ -270,16 +269,16 @@ public class MainActivity
         /**
          * Allows Activity to be garbage collected properly.
          */
-        private WeakReference<MainActivity> mActivity;
+        private WeakReference<DownloadActivity> mActivity;
 
         /**
-         * Class constructor constructs mActivity as weak reference
-         * to the activity
+         * Class constructor constructs mActivity as weak reference to
+         * the DownloadActivity.
          * 
          * @param activity
          *            The corresponding activity
          */
-        public DownloadHandler(MainActivity activity) {
+        public DownloadHandler(DownloadActivity activity) {
             mActivity = new WeakReference<>(activity);
         }
 

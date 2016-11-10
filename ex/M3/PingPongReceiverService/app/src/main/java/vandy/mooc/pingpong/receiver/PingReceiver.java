@@ -107,6 +107,11 @@ public class PingReceiver
                                     R.drawable.ping,
                                     notificationId);
 
+            // Send an intent to stop the service.
+            context.stopService(PongService.makePongIntent(context,
+                                                           count,
+                                                           notificationId));
+
             // Inform the activity we've stopped playing.
             mActivity.stopPlaying();
         }
