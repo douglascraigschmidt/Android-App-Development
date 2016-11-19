@@ -69,7 +69,7 @@ public class MusicActivity
         // initialization/implementation.
         super.onCreate(savedInstanceState);
 
-        // Set the default snackbar.
+        // Set the default content view.
         setContentView(R.layout.activity_main);
 
         // Initialize the views.

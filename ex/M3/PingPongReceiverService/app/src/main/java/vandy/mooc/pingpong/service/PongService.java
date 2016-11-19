@@ -10,10 +10,10 @@ import vandy.mooc.pingpong.R;
 import vandy.mooc.pingpong.utils.UiUtils;
 
 /**
- * A started service that handles "pong" intents.
+ * An IntentService that handles "pong" intents.
  */
 public class PongService
-        extends Service {
+        extends IntentService {
     /**
      * Debugging tag used by the Android logger.
      */
@@ -53,15 +53,13 @@ public class PongService
     }
 
     /**
-     * Hook method called by the Android ActivityManagerService framework after
-     * a startService() call has been make the client.
+     * Hook method called by the IntentService framework after a
+     * startService() call has been make the client.
      *
      * @param intent    An intent containing pong data.
      */
     @Override
-    public int onStartCommand(Intent intent,
-                              int flags,
-                              int startid) {
+    public void onHandleIntent(Intent intent) {
         // Get the count from the PingReceiver.
         Integer count = intent.getIntExtra(COUNT, 0);
         Log.d(TAG, "onStartCommand() called with count of "
@@ -92,19 +90,10 @@ public class PongService
         }
 
         // Broadcast a "ping", incrementing the count by one.
-        sendBroadcast(vandy.mooc.pingpong.receiver.PingReceiver.makePingIntent
-                              (this,
-                               count + 1,
-                               notificationId));
-
-        // We don't care if the service is restarted.
-        return START_NOT_STICKY;
+        sendBroadcast(PingReceiver.makePingIntent
+                      (this,
+                       count + 1,
+                       notificationId));
     }
-
-    /**
-     * Return null to indicate that PongService is a started service.
-     */
-    @Override
-    public IBinder onBind(Intent intent) { return null; }
 }
 

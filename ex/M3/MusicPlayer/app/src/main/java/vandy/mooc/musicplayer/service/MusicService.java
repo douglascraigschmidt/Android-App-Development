@@ -17,8 +17,9 @@ import java.io.IOException;
  * the UI Thread, it implements MediaPlayer.OnPreparedListener to
  * avoid blocking the UI Thread while a song is initially streamed.
  */
-public class MusicService extends Service
-                          implements MediaPlayer.OnPreparedListener {
+public class MusicService 
+       extends Service
+       implements MediaPlayer.OnPreparedListener {
     /**
      * Debugging tag used by the Android logger.
      */
@@ -38,14 +39,24 @@ public class MusicService extends Service
      * This factory method returns an explicit intent used to play and
      * stop playing a song, which is designated by the @a songURL.
      */
-    public static Intent makeIntent(final Context context,
+    public static Intent makeIntent(Context context,
                                     Uri songURL) {
         // Create and return an explicit intent that will start the
         // MusicService.
         return new Intent(context,
                           MusicService.class)
+            // Set the Song URL.
             .setData(songURL);
 
+    }
+
+    /**
+     * This no-op method is necessary since MusicService is a
+     * so-called "Started Service".
+     */
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     /**
@@ -150,14 +161,5 @@ public class MusicService extends Service
 
         // Note that no song is playing.
         mSongPlaying = false;
-    }
-
-    /**
-     * This no-op method is necessary since MusicService is a
-     * so-called "Started Service".
-     */
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
     }
 }
