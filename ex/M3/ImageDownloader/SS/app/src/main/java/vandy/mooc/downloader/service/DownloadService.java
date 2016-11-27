@@ -97,7 +97,7 @@ public class DownloadService
                               int flags,
                               int startId) {
         // Create a Message that will be sent to ServiceHandler to
-        // retrieve animagebased on the URI in the Intent.
+        // retrieve an image-based on the URI in the Intent.
         Message message =
             mServiceHandler.makeDownloadMessage(intent,
                                                 startId);
@@ -149,7 +149,10 @@ public class DownloadService
          * with the Intent.
          */
         public void handleMessage(Message message) {
-            // Download the image at the given url
+            // Get the intent from the message.
+            Intent intent = (Intent) message.obj;
+
+            // Download the image at the given url.
             Uri uri = DownloadUtils.downloadImage(DownloadService.this,
                                                   intent.getData());
 
