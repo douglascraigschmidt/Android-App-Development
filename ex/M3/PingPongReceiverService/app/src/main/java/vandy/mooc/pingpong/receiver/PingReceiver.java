@@ -14,7 +14,7 @@ import vandy.mooc.pingpong.utils.UiUtils;
  * A broadcast receiver that handles "ping" intents.
  */
 public class PingReceiver
-        extends BroadcastReceiver {
+       extends BroadcastReceiver {
     /**
      * Intent sent to the PingReceiver.
      */
@@ -58,7 +58,8 @@ public class PingReceiver
     /**
      * Constructor sets the fields.
      */
-    public PingReceiver(MainActivity activity, int maxCount) {
+    public PingReceiver(MainActivity activity, 
+                        int maxCount) {
         mActivity = activity;
         mMaxCount = maxCount;
     }

@@ -23,7 +23,7 @@ import static vandy.mooc.pingpong.R.id.count;
  * broadcast receiver that is dynamically registered.
  */
 public class MainActivity
-        extends LifecycleLoggingActivity {
+       extends LifecycleLoggingActivity {
     /**
      * Number of times to send "ping" and "pong" if the user doesn't specify
      * otherwise.
@@ -48,7 +48,7 @@ public class MainActivity
     private FloatingActionButton mSetFab;
 
     /**
-     * Reference to the "play" floating action button.
+     * Reference to the "start or stop" floating action button.
      */
     private FloatingActionButton mStartOrStopFab;
 
@@ -59,7 +59,8 @@ public class MainActivity
     private final static int NOTIFICATION_ID = 1;
 
     /**
-     * Dynamically registered broadcast receiver that handles "pings".
+     * Dynamically registered broadcast receiver that handles "ping"
+     * intents.
      */
     private PingReceiver mPingReceiver;
 
@@ -84,8 +85,8 @@ public class MainActivity
     }
 
     /**
-     * Hook method called when activity is about to lose focus. Release
-     * resources that may cause a memory leak.
+     * Hook method called when activity is about to lose
+     * focus. Release resources that may cause a memory leak.
      */
     @Override
     protected void onPause() {
@@ -129,6 +130,19 @@ public class MainActivity
     }
 
     /**
+     * Register the PingReceiver dynamically.
+     */
+    private void registerPingReceiver() {
+        // Create an intent filter for ACTION_VIEW_PING.
+        IntentFilter intentFilter =
+                new IntentFilter(PingReceiver.ACTION_VIEW_PING);
+
+        // Register the receiver and the intent filter.
+        registerReceiver(mPingReceiver,
+                         intentFilter);
+    }
+
+    /**
      * Called by the Android Activity framework when the user clicks
      * the "startOrStopPlaying" button.
      *
@@ -142,7 +156,7 @@ public class MainActivity
             // Get the count from the edit view.
             int count = Integer.valueOf(mCountEditText.getText().toString());
 
-            // Make sure there's a non-0 count.
+            // Make sure there's a count greater than 0.
             if (count <= 0) 
                 // Inform the user there's a problem with the input.
                 UiUtils.showToast(this,
@@ -282,18 +296,4 @@ public class MainActivity
                                                                 animRedId));
         }
     }
-
-    /**
-     * Register the PingReceiver dynamically.
-     */
-    private void registerPingReceiver() {
-        // Create an intent filter for ACTION_VIEW_PING.
-        IntentFilter intentFilter =
-                new IntentFilter(PingReceiver.ACTION_VIEW_PING);
-
-        // Register the receiver and the intent filter.
-        registerReceiver(mPingReceiver,
-                         intentFilter);
-    }
-
 }

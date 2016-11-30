@@ -87,6 +87,8 @@ public class DownloadService
         mServiceLooper = thread.getLooper();
         mServiceHandler =
             new ServiceHandler(mServiceLooper);
+        // ServiceHandler.handleMessage() will now be dispatched in
+        // the HandlerThread.
     }
 
     /**
@@ -135,11 +137,15 @@ public class DownloadService
         private Message makeDownloadMessage(Intent intent,
                                             int startId){
             Message message = Message.obtain();
-            // Include Intent & startId in Message to indicate which URI
-            // to retrieve and which request is being stopped when
+            // Include Intent and startId in Message to indicate which
+            // URI to retrieve and which request is being stopped when
             // download completes.
             message.obj = intent;
+
+            // The Service is only stopped when startId matches the
+            // last start request.
             message.arg1 = startId;
+
             return message;
         }
 
@@ -159,9 +165,13 @@ public class DownloadService
             // Send the pathname via the messenger in the intent.
             sendPath(intent, uri);
             
-            // Stop the Service using the startId, so it doesn't stop
+            // stopSelf() only stops the service when startId matches
+            // the last start request to avoid destroying the service
             // in the middle of handling another download request.
             stopSelf(message.arg1);
+
+            // More complex mechanisms are needed to stop
+            // multi-threaded services.
         }
 
         /**
@@ -181,6 +191,8 @@ public class DownloadService
                 // Send pathname to back to the DownloadActivity.
                 messenger.send(message);
             } catch (RemoteException e) {
+                // DeadObjectException is thrown if target handler no
+                // longer exists.
                 Log.e(getClass().getName(),
                       "Exception while sending.",
                       e);

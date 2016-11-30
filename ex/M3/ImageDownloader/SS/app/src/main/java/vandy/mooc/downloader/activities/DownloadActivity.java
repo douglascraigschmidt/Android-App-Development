@@ -26,6 +26,8 @@ import vandy.mooc.downloader.utils.UriUtils;
 /**
  * This activity prompts the user for a URL to an image and then uses
  * intents and a started service to download the image and view it.
+ * It uses the Android HaMeR framework and messengers to avoid
+ * blocking synchronously during any long-duration operations.
  */
 public class DownloadActivity
        extends ActivityBase {
@@ -249,6 +251,9 @@ public class DownloadActivity
                 // a Service.  The downloaded image is later diplayed in the
                 // UI Thread via the downloadHandler() method defined below.
                 Intent intent =
+                    // The makeIntent() method runs in the context of
+                    // the DownloadActivity process, not the
+                    // DownloadService process!!
                     DownloadService.makeIntent(this,
                                                url,
                                                mDownloadHandler);
@@ -256,62 +261,6 @@ public class DownloadActivity
                 // Start the DownloadService.
                 startService(intent);
             }
-        }
-    }
-
-    /**
-     * A nested class that inherits from Handler and uses its
-     * handleMessage() hook method to process Messages sent to
-     * it from the DownloadService.
-     */
-    private static class DownloadHandler
-            extends Handler {
-        /**
-         * Allows Activity to be garbage collected properly.
-         */
-        private WeakReference<DownloadActivity> mActivity;
-
-        /**
-         * Class constructor constructs mActivity as weak reference to
-         * the DownloadActivity.
-         * 
-         * @param activity
-         *            The corresponding activity
-         */
-        public DownloadHandler(DownloadActivity activity) {
-            mActivity = new WeakReference<>(activity);
-        }
-
-        /**
-         * This hook method is dispatched in response to receiving the
-         * pathname back from the DownloadService.
-         */
-        public void handleMessage(Message message) {
-            // Bail out if the DownloadActivity is gone.
-            if (mActivity.get() == null)
-                return;
-
-            // Try to extract the pathname from the message.
-            String pathname = DownloadService.getPathname(message);
-                
-            // See if the download worked or not.
-            if (pathname == null)
-                mActivity.get().showDialog("failed download");
-
-            // Stop displaying the progress dialog.
-            mActivity.get().dismissDialog();
-
-            // Call the makeGalleryIntent() factory method to create
-            // an Intent that will launch the "Gallery" app by passing
-            // in the path to the downloaded image file.
-            Intent intent =
-                mActivity.get().makeGalleryIntent(pathname);
-
-            // Start the default Android Gallery app image viewer.
-            mActivity.get().startActivity(intent);
-
-            // Allow user to click the download button again.
-            mActivity.get().mProcessButtonClick = true;
         }
     }
 
@@ -349,5 +298,62 @@ public class DownloadActivity
     public void dismissDialog() {
         if (mProgressDialog != null)
             mProgressDialog.dismiss();
+    }
+
+    /**
+     * A nested class that inherits from Handler and uses its
+     * handleMessage() hook method to process Messages sent to
+     * it from the DownloadService.
+     */
+    private static class DownloadHandler
+            extends Handler {
+        /**
+         * Allows Activity to be garbage collected properly.
+         */
+        private WeakReference<DownloadActivity> mActivity;
+
+        /**
+         * Class constructor constructs mActivity as weak reference to
+         * the DownloadActivity.
+         * 
+         * @param activity
+         *            The corresponding activity
+         */
+        public DownloadHandler(DownloadActivity activity) {
+            mActivity = new WeakReference<>(activity);
+        }
+
+        /**
+         * This hook method is dispatched in response to receiving the
+         * pathname back from the DownloadService.  It runs in the
+         * context of the UI thread.
+         */
+        public void handleMessage(Message message) {
+            // Bail out if the DownloadActivity is gone.
+            if (mActivity.get() == null)
+                return;
+
+            // Try to extract the pathname from the message.
+            String pathname = DownloadService.getPathname(message);
+                
+            // See if the download worked or not.
+            if (pathname == null)
+                mActivity.get().showDialog("failed download");
+
+            // Stop displaying the progress dialog.
+            mActivity.get().dismissDialog();
+
+            // Call the makeGalleryIntent() factory method to create
+            // an Intent that will launch the "Gallery" app by passing
+            // in the path to the downloaded image file.
+            Intent intent =
+                mActivity.get().makeGalleryIntent(pathname);
+
+            // Start the default Android Gallery app image viewer.
+            mActivity.get().startActivity(intent);
+
+            // Allow user to click the download button again.
+            mActivity.get().mProcessButtonClick = true;
+        }
     }
 }

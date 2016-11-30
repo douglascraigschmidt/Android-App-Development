@@ -5,7 +5,7 @@ android {
     buildToolsVersion "24.0.0"
 
     defaultConfig {
-        applicationId "vandy.mooc.pingpongreceiverservice"
+        applicationId "vandy.mooc.uniqueidgen"
         minSdkVersion 24
         targetSdkVersion 24
         versionCode 1

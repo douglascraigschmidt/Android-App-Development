@@ -13,7 +13,7 @@ import vandy.mooc.pingpong.utils.UiUtils;
  * An IntentService that handles "pong" intents.
  */
 public class PongService
-        extends IntentService {
+       extends IntentService {
     /**
      * Debugging tag used by the Android logger.
      */
