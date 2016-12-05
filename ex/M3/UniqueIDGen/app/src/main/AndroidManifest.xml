@@ -1,25 +1,27 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" 
-          package="vandy.mooc.uniqueidgen"
-          android:versionCode="1"
-          android:versionName="1.0" >
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="vandy.mooc.uniqueidgen">
 
-  <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="18" />
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
 
-  <application android:icon="@drawable/icon">
+        <activity
+            android:name=".activities.UniqueIDGenActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
 
-    <activity android:name=".activities.UniqueIDGenActivity" 
-                  android:label="@string/app_name">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
-    </activity>
-    
-    <service android:name=".service.UniqueIDGenService"
-             android:exported="true" 
-             android:process=":IdService">
-    </service>
-  </application>
+        <service
+            android:name=".service.UniqueIDGenService"
+            android:exported="true"
+            android:process=":IdService">
+        </service>
+    </application>
 </manifest> 

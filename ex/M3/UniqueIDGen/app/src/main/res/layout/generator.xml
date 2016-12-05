@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vandy.mooc.uniqueidgen.views.GeneratorView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/generator_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    tools:context="vandy.mooc.uniqueidgen.activities.MainActivity"
+    tools:showIn="@layout/activity_main">
+
+    <Button
+        android:id="@+id/service_button"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/rounded_rect_border_layout"
+        android:clipToPadding="false"
+        android:text="@string/service_button"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        android:layout_width="200dp"/>
+
+    <Button
+        android:id="@+id/activity_button"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/rounded_rect_border_layout"
+        android:clipToPadding="false"
+        android:text="@string/activity_button"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/service_button"
+        android:layout_width="300dp"/>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        app:layout_constraintHorizontal_bias="0.57"
+        app:layout_constraintLeft_toLeftOf="@+id/service_button"
+        app:layout_constraintRight_toRightOf="@+id/service_button"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@+id/guid_text_view">
+
+        <FrameLayout
+            android:id="@+id/frameLayout3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/rounded_rect_border_layout"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/thread1_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/thread1_name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Button"/>
+
+            <ProgressBar
+                android:id="@+id/thread1_progressBar"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/frameLayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/rounded_rect_border_layout"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/thread2_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/thread2_name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Button"/>
+
+            <ProgressBar
+                android:id="@+id/thread2_progressBar"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/frameLayout4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/rounded_rect_border_layout"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/thread3_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/thread3_name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Button"/>
+
+            <ProgressBar
+                android:id="@+id/thread3_progressBar"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"/>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/frameLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/rounded_rect_border_layout"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/thread4_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/thread4_name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Button"/>
+
+            <ProgressBar
+                android:id="@+id/thread4_progressBar"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"/>
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/output_path_view"
+        android:background="@drawable/down_path"
+        android:clipToPadding="false"
+        android:layout_marginStart="80dp"
+        app:layout_constraintLeft_toRightOf="@+id/input_path_view"
+        android:layout_width="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/activity_button"
+        app:layout_constraintTop_toBottomOf="@+id/service_button"
+        android:layout_height="0dp"
+        app:layout_constraintVertical_bias="0.0"/>
+
+    <View
+        android:id="@+id/input_path_view"
+        android:layout_width="10dp"
+        android:background="@drawable/up_path"
+        android:clipToPadding="false"
+        app:layout_constraintLeft_toLeftOf="@+id/activity_button"
+        app:layout_constraintBottom_toTopOf="@+id/activity_button"
+        android:layout_marginStart="104dp"
+        app:layout_constraintTop_toBottomOf="@+id/service_button"
+        android:layout_height="0dp"
+        app:layout_constraintVertical_bias="1.0"/>
+
+    <View
+        android:id="@+id/thread1_path_view"
+        android:layout_width="10dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="23dp"
+        android:background="@drawable/up_and_down_path"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toTopOf="@+id/service_button"
+        app:layout_constraintLeft_toLeftOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="1.0"/>
+
+    <View
+        android:id="@+id/thread2_path_view"
+        android:layout_width="10dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="47dp"
+        android:background="@drawable/up_and_down_path"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toTopOf="@+id/service_button"
+        app:layout_constraintLeft_toRightOf="@+id/thread1_path_view"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="1.0"/>
+
+    <View
+        android:id="@+id/thread3_path_view"
+        android:layout_width="10dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="46dp"
+        android:background="@drawable/up_and_down_path"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toTopOf="@+id/service_button"
+        app:layout_constraintLeft_toRightOf="@+id/thread2_path_view"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="1.0"/>
+
+    <View
+        android:id="@+id/thread4_path_view"
+        android:layout_width="10dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="47dp"
+        android:background="@drawable/up_and_down_path"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toTopOf="@+id/service_button"
+        app:layout_constraintLeft_toRightOf="@+id/thread3_path_view"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="0.0"/>
+
+    <View
+        android:id="@+id/guid_path_view"
+        android:background="@drawable/output_path"
+        android:clipToPadding="false"
+        android:layout_width="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/output_path_view"
+        app:layout_constraintTop_toBottomOf="@+id/guid_text_view"
+        android:layout_height="0dp"
+        app:layout_constraintRight_toRightOf="@+id/guid_text_view"
+        android:layout_marginEnd="24dp"
+        app:layout_constraintVertical_bias="0.0"/>
+
+    <View
+        android:id="@+id/play_path_view"
+        android:layout_width="10dp"
+        android:background="@drawable/up_path"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@+id/activity_button"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="@+id/activity_button"
+        app:layout_constraintRight_toRightOf="@+id/activity_button"
+        app:layout_constraintBottom_toTopOf="@+id/play_fab"
+        android:layout_height="0dp"/>
+
+    <TextView
+        android:id="@+id/guid_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rect_border_layout"
+        android:clipToPadding="false"
+        android:padding="4dp"
+        android:text="@string/empty_guid_value"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="24dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:fontFamily="monospace"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/filled_circle"
+        android:id="@+id/play_fab"
+        android:layout_marginTop="80dp"
+        app:layout_constraintTop_toBottomOf="@+id/activity_button"
+        app:layout_constraintLeft_toLeftOf="@+id/activity_button"
+        app:layout_constraintRight_toRightOf="@+id/activity_button"/>
+
+</vandy.mooc.uniqueidgen.views.GeneratorView>

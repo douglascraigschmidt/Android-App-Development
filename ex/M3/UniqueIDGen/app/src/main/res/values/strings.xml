@@ -1,4 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">UniqueIDGen</string>
+    <string name="app_name">GUID Generator</string>
+    <string name="action_settings">Settings</string>
+    <string name="service_button">Service</string>
+    <string name="activity_button">Activity</string>
+    <string name="empty_guid_value">00000000-0000-0000-0000-000000000000</string>
+    <string name="thread1_name">T1</string>
+    <string name="thread2_name">T2</string>
+    <string name="thread3_name">T3</string>
+    <string name="thread4_name">T4</string>
 </resources>

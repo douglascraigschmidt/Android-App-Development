@@ -7,13 +7,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.UUID;
 
+import vandy.mooc.uniqueidgen.views.GeneratorView;
+
+import static java.lang.Thread.sleep;
 
 /**
  * This class generates unique IDs via a pool of Threads and sends
@@ -21,14 +23,8 @@ import java.util.UUID;
  * creates a ThreadPoolExecutor using the newFixedThreadPool() method
  * of the Executors class.
  */
-class RequestHandler 
+class RequestHandler
       extends Handler {
-    /**
-     * A class constant that determines the maximum number of threads
-     * used to service download requests.
-     */
-    private final int MAX_THREADS = 4;
-	
     /**
      * The ExecutorService implementation that references a fixed-size
      * thread pool.
@@ -36,10 +32,16 @@ class RequestHandler
     private ExecutorService mExecutor;
 
     /**
-     * A collection of unique IDs implemented internally using a
+     * A reference to the default shared preferences in which we store
+     * a collection of unique IDs implemented internally using a
      * persistent Java HashMap.
      */
-    private SharedPreferences mUniqueIds;
+    private SharedPreferences mSharedPrefs;
+
+    /**
+     * An artificial sleep delay to simulate a busy thread.
+     */
+    private static final int MAX_DELAY = 2000;
 
     /**
      * Initialize RequestHandler to generate IDs concurrently.
@@ -47,26 +49,23 @@ class RequestHandler
     public RequestHandler(Context context) {
         // Get a SharedPreferences instance that points to the default
         // file used by the preference framework in this Service.
-        mUniqueIds = 
-            PreferenceManager.getDefaultSharedPreferences
-            (context);
+        mSharedPrefs = 
+            PreferenceManager.getDefaultSharedPreferences(context);
 
         // Create a FixedThreadPool Executor that's configured to use
         // MAX_THREADS.
-        mExecutor = 
-            Executors.newFixedThreadPool(MAX_THREADS);
+        mExecutor =
+            Executors.newFixedThreadPool(UniqueIDGenService.MAX_THREADS);
     }
 
     // Ensure threads used by the ThreadPoolExecutor complete and
     // are reclaimed by the system.
     public void shutdown() {
-	// Shutdown the thread pool *now*!
         mExecutor.shutdownNow();
     }
 
     /**
-     * Return a Message containing an ID that's unique
-     * system-wide.
+     * Return a Message containing an ID that's unique system-wide.
      */
     private Message generateUniqueID() {
         String uniqueID;
@@ -82,23 +81,30 @@ class RequestHandler
             // being extra paranoid for the sake of this example.. ;-)
             do {
                 uniqueID = UUID.randomUUID().toString();
-            } while (mUniqueIds.getInt(uniqueID, 0) == 1);
+            } while (mSharedPrefs.getInt(uniqueID, 0) == 1);
 
             // We found a unique ID, so add it as the "key" to the
             // persistent collection of SharedPreferences, with a
             // value of 1 to indicate this ID is already "used".
-            SharedPreferences.Editor editor = mUniqueIds.edit();
+            SharedPreferences.Editor editor = mSharedPrefs.edit();
             editor.putInt(uniqueID, 1);
-            
+
             // Commit the change so it's stored persistently.
             editor.commit();
+
+            // Simulate a delay for the animation to make sense.
+            try {
+                sleep(MAX_DELAY);
+            } catch (InterruptedException e) {
+            }
         }
 
         // Create a Message that's used to send the unique ID back to
         // the UniqueIDGeneratorActivity.
         Message reply = Message.obtain();
         Bundle data = new Bundle();
-        data.putString(UniqueIDGenService.ID, uniqueID);
+        data.putString(UniqueIDGenService.ID,
+                       uniqueID);
         reply.setData(data);
         return reply;
     }
@@ -109,25 +115,46 @@ class RequestHandler
      * the Messenger used to reply to the Activity.
      */
     public void handleMessage(Message request) {
+
         // Store the reply messenger so it doesn't change out from
         // underneath us.
-        final Messenger replyMessengerRef = request.replyTo;
+        final Messenger replyMessenger = request.replyTo;
+
+        // Store the request id so that it can be bounced back
+        // as in arg1 of the replay message.
+        final int requestId = request.arg1;
 
         // Log.d(TAG, "replyMessenger = " + replyMessenger.hashCode());
 
-        // Create a lambda expression (runnable) and give it to the
-        // thread pool for subsequent concurrent processing.
+        // Create a runnable give it to the thread pool for subsequent
+        // concurrent processing.
         mExecutor.execute(() -> {
+            try {
+                // Send an reply to show an animation from the
+                // service to this thread.
+                Message animationReply = Message.obtain();
+                animationReply.arg1 = requestId;
+                animationReply.arg2 = (int)Thread.currentThread().getId();
+                replyMessenger.send(animationReply);
+
                 // Generate a unique ID.
                 Message reply = generateUniqueID();
-                        
-                try {
-                    // Send the reply back to the UniqueIDGenActivity.
-                    replyMessengerRef.send(reply);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            });
+
+                // Send a replay to show an animation back
+                // from thread to service.
+                animationReply.arg2 = GeneratorView.SERVICE_NODE;
+                replyMessenger.send(animationReply);
+
+                // Set reply message id and path to animate.
+                reply.arg1 = requestId;
+                reply.arg2 = GeneratorView.ACTIVITY_NODE;
+
+                // Send the reply back to the Activity.
+                replyMessenger.send(reply);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        });
 
     }
 }

@@ -1,29 +1,28 @@
 package vandy.mooc.uniqueidgen.activities;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 /**
- * This abstract class extends the Activity class and overrides
- * lifecycle callbacks for logging various lifecycle events.
+ * This abstract class extends the Activity class and overrides lifecycle
+ * callbacks for logging various lifecycle events.
  */
-public abstract class LifecycleLoggingActivity 
-       extends Activity {
+public abstract class LifecycleLoggingActivity
+        extends AppCompatActivity {
     /**
      * Debugging tag used by the Android logger.
      */
     protected final String TAG =
-        getClass().getSimpleName();
+            getClass().getSimpleName();
 
     /**
      * Hook method called when a new instance of Activity is created. One time
      * initialization code should go here e.g. UI layout, some class scope
      * variable initialization. if finish() is called from onCreate no other
      * lifecycle callbacks are called except for onDestroy().
-     * 
-     * @param savedInstanceState
-     *            object that contains saved state information.
+     *
+     * @param savedInstanceState object that contains saved state information.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +73,8 @@ public abstract class LifecycleLoggingActivity
         // hook method is being called.
         super.onResume();
         Log.d(TAG,
-              "onResume() - the activity has become visible (it is now \"resumed\")");
+              "onResume() - the activity has become visible (it is now "
+                      + "\"resumed\")");
     }
 
     /**
@@ -91,7 +91,8 @@ public abstract class LifecycleLoggingActivity
         // hook method is being called.
         super.onPause();
         Log.d(TAG,
-              "onPause() - another activity is taking focus (this activity is about to be \"paused\")");
+              "onPause() - another activity is taking focus (this activity is"
+                      + " about to be \"paused\")");
     }
 
     /**
@@ -106,7 +107,8 @@ public abstract class LifecycleLoggingActivity
         // hook method is being called.
         super.onStop();
         Log.d(TAG,
-              "onStop() - the activity is no longer visible (it is now \"stopped\")");
+              "onStop() - the activity is no longer visible (it is now "
+                      + "\"stopped\")");
     }
 
     /**
