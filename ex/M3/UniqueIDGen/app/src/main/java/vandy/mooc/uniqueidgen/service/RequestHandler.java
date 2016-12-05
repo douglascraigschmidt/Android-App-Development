@@ -51,8 +51,8 @@ class RequestHandler
             PreferenceManager.getDefaultSharedPreferences
             (context);
 
-        // Create a FixedThreadPool Executor that's configured to
-        // use MAX_THREADS.
+        // Create a FixedThreadPool Executor that's configured to use
+        // MAX_THREADS.
         mExecutor = 
             Executors.newFixedThreadPool(MAX_THREADS);
     }
@@ -60,7 +60,8 @@ class RequestHandler
     // Ensure threads used by the ThreadPoolExecutor complete and
     // are reclaimed by the system.
     public void shutdown() {
-        mExecutor.shutdown();
+	// Shutdown the thread pool *now*!
+        mExecutor.shutdownNow();
     }
 
     /**
@@ -75,8 +76,10 @@ class RequestHandler
             // This loop keeps generating a random UUID if it's not
             // unique (i.e., is not currently found in the persistent
             // collection of SharedPreferences).  The likelihood of a
-            // non-unique UUID is low, but we're being extra paranoid
-            // for the sake of this example ;-)
+            // non-unique UUID is low, as per the discussion in
+            // en.wikipedia.org/wiki/Universally_unique_identifier
+            // #Random_UUID_probability_of_duplicates.  However, we're
+            // being extra paranoid for the sake of this example.. ;-)
             do {
                 uniqueID = UUID.randomUUID().toString();
             } while (mUniqueIds.getInt(uniqueID, 0) == 1);
@@ -106,22 +109,21 @@ class RequestHandler
      * the Messenger used to reply to the Activity.
      */
     public void handleMessage(Message request) {
-
         // Store the reply messenger so it doesn't change out from
         // underneath us.
-        final Messenger replyMessenger = request.replyTo;
+        final Messenger replyMessengerRef = request.replyTo;
 
         // Log.d(TAG, "replyMessenger = " + replyMessenger.hashCode());
 
-        // Create a runnable give it to the thread pool for subsequent
-        // concurrent processing.
+        // Create a lambda expression (runnable) and give it to the
+        // thread pool for subsequent concurrent processing.
         mExecutor.execute(() -> {
                 // Generate a unique ID.
                 Message reply = generateUniqueID();
                         
                 try {
                     // Send the reply back to the UniqueIDGenActivity.
-                    replyMessenger.send(reply);
+                    replyMessengerRef.send(reply);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }

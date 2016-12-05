@@ -114,11 +114,12 @@ public class DownloadService
     }
 
     /**
-     * An inner class that inherits from Handler and uses its
+     * A inner class that inherits from Handler and uses its
      * handleMessage() hook method to process Messages sent to it from
      * onStartCommnand() that indicate which images to download.
      */
-    private final class ServiceHandler extends Handler {
+    private final class ServiceHandler 
+            extends Handler {
         /**
          * Class constructor initializes the Looper.
          * 
@@ -159,15 +160,18 @@ public class DownloadService
             Intent intent = (Intent) message.obj;
 
             // Download the image at the given url.
-            Uri uri = DownloadUtils.downloadImage(DownloadService.this,
-                                                  intent.getData());
+            Uri uri =
+		DownloadUtils.downloadImage(DownloadService.this,
+					    intent.getData());
 
             // Send the pathname via the messenger in the intent.
             sendPath(intent, uri);
             
-            // stopSelf() only stops the service when startId matches
-            // the last start request to avoid destroying the service
-            // in the middle of handling another download request.
+            // stopSelf() implements the "concurrent service stopping
+            // idiom" and only stops the service when startId matches
+            // the last start request (received by onStartCommand())
+            // to avoid destroying the service in the middle of
+            // handling another download request.
             stopSelf(message.arg1);
 
             // More complex mechanisms are needed to stop
@@ -213,7 +217,7 @@ public class DownloadService
 
                 // Pathname for the downloaded image.
                 data.putString(PATHNAME,
-                        pathname.toString());
+			       pathname.toString());
                 message.setData(data);
             } else
                 message.arg1 = Activity.RESULT_CANCELED;

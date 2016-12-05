@@ -8,14 +8,16 @@ import android.os.Message;
 import android.os.Messenger;
 
 /**
- * This Service generates unique IDs via a Thread pool and returns the
- * IDs to the UniqueIDGenActivity.
+ * This Service generates unique IDs via a thread pool and returns the
+ * IDs to the UniqueIDGenActivity.  A thread pool can process requests
+ * concurrently and improve performance on a multi-core device.
  * 
  * This class implements the Synchronous Service layer of the
  * Half-Sync/Half-Async pattern.  It also implements a variant of the
  * Factory Method pattern.
  */
-public class UniqueIDGenService extends Service {
+public class UniqueIDGenService 
+       extends Service {
     /**
      * Used for debugging.
      */
@@ -52,6 +54,15 @@ public class UniqueIDGenService extends Service {
     }
 
     /**
+     * Factory method that returns the underlying IBinder associated
+     * with the Request Messenger.
+     */
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mReqMessenger.getBinder();
+    }
+
+    /**
      * Factory method to make the desired Intent.
      */
     public static Intent makeIntent(Context context) {
@@ -78,15 +89,6 @@ public class UniqueIDGenService extends Service {
     	// Ensure threads used by the ThreadPoolExecutor complete and
     	// are reclaimed by the system.
         mRequestHandler.shutdown();
-    }
-
-    /**
-     * Factory method that returns the underlying IBinder associated
-     * with the Request Messenger.
-     */
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mReqMessenger.getBinder();
     }
 }
     

@@ -17,7 +17,7 @@ import vandy.mooc.uniqueidgen.service.UniqueIDGenService;
 import vandy.mooc.uniqueidgen.R;
 
 /**
- * A class that interacts with a user to generate a system-wide unique
+ * This class interacts with a user to generate a system-wide unique
  * ID via the UniqueIDGenService, which is a bound service.
  */
 public class UniqueIDGenActivity 
@@ -113,7 +113,8 @@ public class UniqueIDGenActivity
         mOutput = (TextView) findViewById(R.id.output);
 
         // Initialize the reply messenger.
-        mReplyMessenger = new Messenger(new ReplyHandler());
+        mReplyMessenger =
+	    new Messenger(new ReplyHandler());
     }
 
     /**
