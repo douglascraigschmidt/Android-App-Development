@@ -117,8 +117,8 @@ public class PingReceiver
             mActivity.stopPlaying();
         }
 
-        // If we're not done then update the status bar and "go async"
-        // by creating a thread and broadcasting a "pong" intent.
+        // If we're not done then update the status bar and start the
+        // PongService to continue playing the ping/pong game.
         else {
             // Update the status bar notification.
             UiUtils.updateStatusBar(context,

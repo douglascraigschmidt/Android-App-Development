@@ -40,7 +40,7 @@ public class PongService
     /**
      * The IntentService needs a constructor.
      */
-    PongService() {
+    public PongService() {
         super("PongService");
     }
 

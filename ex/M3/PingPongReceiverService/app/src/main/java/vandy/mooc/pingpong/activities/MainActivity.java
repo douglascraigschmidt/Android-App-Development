@@ -85,6 +85,50 @@ public class MainActivity
     }
 
     /**
+     * Initialize the views.
+     */
+    private void initializeViews() {
+        // Set the EditText that holds the count entered by the user
+        // (if any).
+        mCountEditText = (EditText) findViewById(count);
+
+        // Cache floating action button that sets the count.
+        mSetFab = (FloatingActionButton) findViewById(R.id.set_fab);
+
+        // Cache floating action button that starts or stops playing
+        // ping/pong.
+        mStartOrStopFab = (FloatingActionButton) findViewById(R.id.play_fab);
+
+        // Make the EditText invisible for animation purposes.
+        mCountEditText.setVisibility(View.INVISIBLE);
+
+        // Make the count button invisible for animation purposes.
+        mStartOrStopFab.setVisibility(View.INVISIBLE);
+
+        // Register a listener to help display "start playing" FAB
+        // when the user hits enter.  This listener also sets a
+        // default count value if the user enters no value.
+        mCountEditText.setOnEditorActionListener
+                ((v, actionId, event) -> {
+                    if (actionId == EditorInfo.IME_ACTION_SEARCH
+                            || actionId == EditorInfo.IME_ACTION_DONE
+                            || event.getAction() == KeyEvent.ACTION_DOWN
+                            && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                        UiUtils.hideKeyboard(MainActivity.this,
+                                mCountEditText.getWindowToken());
+                        if (TextUtils.isEmpty
+                                (mCountEditText.getText().toString().trim()))
+                            mCountEditText.setText(String.valueOf(sDEFAULT_COUNT));
+
+                        UiUtils.showFab(mStartOrStopFab);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+    }
+
+    /**
      * Hook method called when activity is about to lose
      * focus. Release resources that may cause a memory leak.
      */
@@ -208,50 +252,6 @@ public class MainActivity
 
         // Reset the start/stop FAB to the play icon.
         mStartOrStopFab.setImageResource(android.R.drawable.ic_media_play);
-    }
-
-    /**
-     * Initialize the views.
-     */
-    private void initializeViews() {
-        // Set the EditText that holds the count entered by the user
-        // (if any).
-        mCountEditText = (EditText) findViewById(count);
-
-        // Cache floating action button that sets the count.
-        mSetFab = (FloatingActionButton) findViewById(R.id.set_fab);
-
-        // Cache floating action button that starts or stops playing
-        // ping/pong.
-        mStartOrStopFab = (FloatingActionButton) findViewById(R.id.play_fab);
-
-        // Make the EditText invisible for animation purposes.
-        mCountEditText.setVisibility(View.INVISIBLE);
-
-        // Make the count button invisible for animation purposes.
-        mStartOrStopFab.setVisibility(View.INVISIBLE);
-
-        // Register a listener to help display "start playing" FAB
-        // when the user hits enter.  This listener also sets a
-        // default count value if the user enters no value.
-        mCountEditText.setOnEditorActionListener
-                ((v, actionId, event) -> {
-                    if (actionId == EditorInfo.IME_ACTION_SEARCH
-                            || actionId == EditorInfo.IME_ACTION_DONE
-                            || event.getAction() == KeyEvent.ACTION_DOWN
-                            && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                        UiUtils.hideKeyboard(MainActivity.this,
-                                             mCountEditText.getWindowToken());
-                        if (TextUtils.isEmpty
-                            (mCountEditText.getText().toString().trim())) 
-                            mCountEditText.setText(String.valueOf(sDEFAULT_COUNT));
-
-                        UiUtils.showFab(mStartOrStopFab);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                });
     }
 
     /**
