@@ -5,9 +5,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.IBinder;
-import android.os.Looper;
+import android.support.annotation.DrawableRes;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -19,17 +18,11 @@ import android.widget.Toast;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.support.annotation.DrawableRes;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import vandy.mooc.pingpong.activities.MainActivity;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
-
-import java.util.Locale;
 
 /**
  * This utility class defines static methods shared by various Activities.
@@ -115,37 +108,6 @@ public class UiUtils {
             (InputMethodManager) activity.getSystemService
             (Context.INPUT_METHOD_SERVICE);
         mgr.hideSoftInputFromWindow(windowToken, 0);
-    }
-
-    /**
-     * Set the result of the Activity to indicate whether the
-     * operation on the content succeeded or not.
-     *
-     * @param activity
-     *          The Activity whose result is being set.
-     * @param pathToContent
-     *          The pathname to the content file.
-     * @param failureReason
-     *          String to add to add as an extra to the Intent passed
-     *          back to the originating Activity if the @a
-     *          pathToContent is null.
-     */
-    public static void setActivityResult(Activity activity,
-                                         Uri pathToContent,
-                                         String failureReason) {
-        if (pathToContent == null)
-            // Indicate why the operation on the content was
-            // unsuccessful or was cancelled.
-            activity.setResult
-                (Activity.RESULT_CANCELED,
-                 new Intent("").putExtra("reason",
-                                         failureReason));
-        else
-            // Set the result of the Activity to designate the path to
-            // the content file resulting from a successful operation.
-            activity.setResult(Activity.RESULT_OK,
-                               new Intent("",
-                                          pathToContent));
     }
 
     /**
@@ -235,32 +197,5 @@ public class UiUtils {
 
         // Clear the text from the EditText when the user touches the X FAB
         text.getText().clear();
-    }
-
-    /**
-     * Return an uppercase version of the input or null if user gave
-     * no input.  If user gave no input and @a showToast is true a
-     * toast is displayed to this effect.
-     */
-    public static String uppercaseInput(Context context,
-                                        String input,
-                                        boolean showToast) {
-        if (input.isEmpty()) {
-            if (showToast)
-                UiUtils.showToast(context,
-                        "no input provided");
-            return null;
-        } else
-            // Convert the input entered by the user so it's in
-            // uppercase.
-            return input.toUpperCase(Locale.ENGLISH);
-    }
-
-    /**
-     * @return True if the caller is running on the UI thread, else
-     * false.
-     */
-    public static boolean runningOnUiThread() {
-        return Thread.currentThread() == Looper.getMainLooper().getThread();
     }
 }

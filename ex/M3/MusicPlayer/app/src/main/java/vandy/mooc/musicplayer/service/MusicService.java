@@ -51,15 +51,6 @@ public class MusicService
     }
 
     /**
-     * This no-op method is necessary since MusicService is a
-     * so-called "Started Service".
-     */
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    /**
      * Hook method called when a new instance of Service is created.
      * One time initialization code goes here.
      */
@@ -76,6 +67,20 @@ public class MusicService
 
         // Indicate the MediaPlayer will stream the audio.
         mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+    }
+
+    /**
+     * Hook method called when the MusicService is stopped.
+     */
+    @Override
+    public void onDestroy() {
+        Log.i(TAG,"onDestroy() entered");
+
+        // Stop playing the song.
+        stopSong();
+
+        // Call up to the super class.
+        super.onDestroy();
     }
 
     /**
@@ -115,6 +120,15 @@ public class MusicService
         return START_NOT_STICKY;
     }
 
+    /**
+     * This no-op method is necessary since MusicService is a
+     * so-called "Started Service".
+     */
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
     /** 
      * Hook method called back when MediaPlayer is ready to play the
      * song.
@@ -134,20 +148,6 @@ public class MusicService
     }
 
     /**
-     * Hook method called when the MusicService is stopped.
-     */
-    @Override
-    public void onDestroy() {
-        Log.i(TAG,"onDestroy() entered");
-
-        // Stop playing the song.
-        stopSong();
-
-        // Call up to the super class.
-        super.onDestroy();
-    }
-
-    /**
      * Stops the MediaPlayer from playing the song.
      */
     private void stopSong() {
@@ -162,4 +162,5 @@ public class MusicService
         // Note that no song is playing.
         mSongPlaying = false;
     }
+
 }

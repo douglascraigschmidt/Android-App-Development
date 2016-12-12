@@ -1,12 +1,12 @@
 package vandy.mooc.pingpong.service;
 
-import android.app.Service;
+import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.os.IBinder;
 import android.util.Log;
 
 import vandy.mooc.pingpong.R;
+import vandy.mooc.pingpong.receiver.PingReceiver;
 import vandy.mooc.pingpong.utils.UiUtils;
 
 /**
@@ -36,6 +36,13 @@ public class PongService
      * visually pleasing.
      */
     private static int DELAY = 1000;
+
+    /**
+     * The IntentService needs a constructor.
+     */
+    PongService() {
+        super("PongService");
+    }
 
     /**
      * Factory method that makes a "pong" explicit intent with the
