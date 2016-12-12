@@ -26,11 +26,10 @@
             </intent-filter>
         </activity>
 
-    <service
-       android:name=".service.MusicService"
-       android:process=":musicService"/>
+        <service
+         android:name=".service.MusicService"
+         android:process=":musicService"/>
 
-    </service>
     </application>
 
 </manifest>
