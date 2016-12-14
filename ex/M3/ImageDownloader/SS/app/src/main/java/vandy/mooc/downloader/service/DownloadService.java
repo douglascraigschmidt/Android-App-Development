@@ -19,7 +19,7 @@ import vandy.mooc.downloader.utils.DownloadUtils;
 
 /**
  * Uses a started service to download and store a bitmap image on
- * behalf of the MainActivity.  DownloadService receives an Intent
+ * behalf of the DownloadActivity.  DownloadService receives an Intent
  * containing a URL (which is a type of URI) and a Messenger. It
  * downloads the file at the URL, stores it on the file system, then
  * returns the path name to the caller using the supplied Messenger.
@@ -47,7 +47,7 @@ public class DownloadService
     private volatile Looper mServiceLooper;
 
     /**
-     * Processes Messages sent to it from onStartCommnand() that
+     * Processes Messages sent to it from onStartCommand() that
      * indicate which images to download from a remote server.
      */
     private volatile ServiceHandler mServiceHandler;
@@ -67,6 +67,13 @@ public class DownloadService
             // DownloadService can send back the pathname.
             .putExtra(MESSENGER,
                       new Messenger(downloadHandler));
+    }
+
+    /**
+     * This hook method is a no-op since we're a Started Service.
+     */
+    public IBinder onBind(Intent arg0) {
+        return null;
     }
 
     /**
@@ -116,7 +123,7 @@ public class DownloadService
     /**
      * A inner class that inherits from Handler and uses its
      * handleMessage() hook method to process Messages sent to it from
-     * onStartCommnand() that indicate which images to download.
+     * onStartCommand() that indicate which images to download.
      */
     private final class ServiceHandler 
             extends Handler {
@@ -161,13 +168,13 @@ public class DownloadService
 
             // Download the image at the given url.
             Uri uri =
-		DownloadUtils.downloadImage(DownloadService.this,
-					    intent.getData());
+		        DownloadUtils.downloadImage(DownloadService.this,
+                                            intent.getData());
 
             // Send the pathname via the messenger in the intent.
             sendPath(intent, uri);
             
-            // stopSelf() implements the "concurrent service stopping
+            // stopSelf() implements Android's "Concurrent Service Stopping
             // idiom" and only stops the service when startId matches
             // the last start request (received by onStartCommand())
             // to avoid destroying the service in the middle of
@@ -250,12 +257,5 @@ public class DownloadService
      */
     public void onDestroy() {
         mServiceLooper.quit();
-    }
-
-    /**
-     * This hook method is a no-op since we're a Started Service.
-     */
-    public IBinder onBind(Intent arg0) {
-        return null;
     }
 }

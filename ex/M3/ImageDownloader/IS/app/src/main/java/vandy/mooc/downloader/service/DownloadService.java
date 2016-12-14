@@ -15,11 +15,11 @@ import android.util.Log;
 import vandy.mooc.downloader.utils.DownloadUtils;
 
 /**
- * Uses an IntentService to download and store a bitmap image on
- * behalf of the MainActivity.  DownloadService receives an Intent
- * containing a URL (which is a type of URI) and a Messenger. It
- * downloads the file at the URL, stores it on the file system, then
- * returns the path name to the caller using the supplied Messenger.
+ * Uses the IntentService framework to download and store a bitmap image
+ * on behalf of the DownloadActivity.  DownloadService receives an Intent
+ * containing a URL (which is a type of URI) and a Messenger. It downloads
+ * the file at the URL, stores it on the file system, then returns the
+ * path name to the caller using the supplied Messenger.
  * 
  * The DownloadService class implements the CommandProcessor pattern
  * and the Messenger is used as part of the Active Object pattern.

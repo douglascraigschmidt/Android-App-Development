@@ -25,8 +25,8 @@ import vandy.mooc.downloader.utils.UriUtils;
 
 /**
  * This activity prompts the user for a URL to an image and then uses
- * intents and a started service to download the image and view it.
- * It uses the Android HaMeR framework and messengers to avoid
+ * an intent and a started service to download the image and view it.
+ * It uses a messenger in conjunction with a started service to avoid
  * blocking synchronously during any long-duration operations.
  */
 public class DownloadActivity
@@ -208,20 +208,6 @@ public class DownloadActivity
     }
 
     /**
-     * Get the URL to download based on user input.
-     */
-    protected Uri getUrl() {
-        // Get the text the user typed in the edit text (if anything).
-        String userInput = mUrlEditText.getText().toString();
-
-        // If the user didn't provide a URL then use the default.
-        if ("".equals(userInput))
-            userInput = DEFAULT_URL;
-
-        return Uri.parse(userInput);
-    }
-
-    /**
      * This method is used to create an Intent and then start the
      * DownloadService with it.
      *
@@ -262,6 +248,20 @@ public class DownloadActivity
                 startService(intent);
             }
         }
+    }
+
+    /**
+     * Get the URL to download based on user input.
+     */
+    protected Uri getUrl() {
+        // Get the text the user typed in the edit text (if anything).
+        String userInput = mUrlEditText.getText().toString();
+
+        // If the user didn't provide a URL then use the default.
+        if ("".equals(userInput))
+            userInput = DEFAULT_URL;
+
+        return Uri.parse(userInput);
     }
 
     /**
