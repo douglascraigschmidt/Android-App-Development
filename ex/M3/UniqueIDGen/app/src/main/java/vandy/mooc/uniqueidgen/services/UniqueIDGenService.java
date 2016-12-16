@@ -1,4 +1,4 @@
-package vandy.mooc.uniqueidgen.service;
+package vandy.mooc.uniqueidgen.services;
 
 import android.app.Service;
 import android.content.Context;
@@ -7,16 +7,18 @@ import android.os.IBinder;
 import android.os.Messenger;
 
 /**
- * This Service generates unique IDs via a thread pool and returns the
- * IDs to the UniqueIDGenActivity.  A thread pool can process requests
- * concurrently and improve performance on a multi-core device.
- * <p>
- * This class implements the Synchronous Service layer of the
- * Half-Sync/Half-Async pattern.  It also implements a variant of the
- * Factory Method pattern.
+ * This bound service works in conjunction with a RequestHandler to generate
+ * unique IDs via a thread pool and return the IDs to the UniqueIDGenActivity.
+ * A thread pool can process requests concurrently and improve performance on
+ * a multi-core device.
  */
 public class UniqueIDGenService 
-       extends Service {
+       extends LifecycleLoggingService {
+    /**
+     * Used for debugging.
+     */
+    private final String TAG = getClass().getName();
+
     /**
      * String used as a key for the unique ID stored in the reply Message.
      */
@@ -28,11 +30,6 @@ public class UniqueIDGenService
      * GeneratorView will know how many threads can be animated.
      */
     public final static int MAX_THREADS = 4;
-
-    /**
-     * Used for debugging.
-     */
-    private final String TAG = getClass().getName();
 
     /**
      * A RequestHandler that processes Messages from the UniqueIDGenService
@@ -61,6 +58,9 @@ public class UniqueIDGenService
      */
     @Override
     public void onCreate() {
+        // Call to super class.
+        super.onCreate();
+
         // The Messenger encapsulates the RequestHandler used to
         // handle request Messages sent from MainActivity.
         mRequestHandler = new RequestHandler(this);
@@ -73,6 +73,9 @@ public class UniqueIDGenService
      */
     @Override
     public IBinder onBind(Intent intent) {
+        // Call to super class.
+        super.onBind(intent);
+
         return mReqMessenger.getBinder();
     }
 
@@ -83,6 +86,9 @@ public class UniqueIDGenService
      */
     @Override
     public void onDestroy() {
+        // Call to super class.
+        super.onDestroy();
+
         // Ensure threads used by the ThreadPoolExecutor complete and
         // are reclaimed by the system.
         mRequestHandler.shutdown();

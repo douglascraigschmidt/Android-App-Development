@@ -1,4 +1,4 @@
-package vandy.mooc.uniqueidgen.service;
+package vandy.mooc.uniqueidgen.services;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,6 +8,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -18,13 +19,17 @@ import vandy.mooc.uniqueidgen.views.GeneratorView;
 import static java.lang.Thread.sleep;
 
 /**
- * This class generates unique IDs via a pool of Threads and sends
- * them back to UniqueIDGeneratorActivity. When it's created, it
- * creates a ThreadPoolExecutor using the newFixedThreadPool() method
- * of the Executors class.
+ * This class generates unique IDs via a pool of threads and sends
+ * them back to UniqueIDGenActivity via a reply messenger contained
+ * in the request message.
  */
 class RequestHandler
       extends Handler {
+    /**
+     * Used for debugging.
+     */
+    private final String TAG = getClass().getName();
+
     /**
      * The ExecutorService implementation that references a fixed-size
      * thread pool.
@@ -62,6 +67,54 @@ class RequestHandler
     // are reclaimed by the system.
     public void shutdown() {
         mExecutor.shutdownNow();
+    }
+
+    /**
+     * Hook method called back when a request message arrives from the
+     * UniqueIDGenActivity.  The message it receives contains
+     * the messenger used to reply to the activity.
+     */
+    public void handleMessage(Message request) {
+        // Store the reply messenger so it doesn't change out from
+        // underneath us.
+        final Messenger replyMessenger = request.replyTo;
+
+        // Store the request id so that it can be bounced back
+        // as in arg1 of the replay message.
+        final int requestId = request.arg1;
+
+        // Create a runnable give it to the thread pool for subsequent
+        // concurrent processing.
+        mExecutor.execute(() -> {
+            try {
+                // Send an reply to show an animation from the
+                // service to this thread.
+                Message animationReply = Message.obtain();
+                animationReply.arg1 = requestId;
+                animationReply.arg2 = (int) Thread.currentThread().getId();
+                replyMessenger.send(animationReply);
+
+                // Generate a unique ID that's 128 bytes long.
+                Message reply = generateUniqueID();
+
+                // Send a replay to show an animation back
+                // from thread to service.
+                animationReply.arg2 = GeneratorView.SERVICE_NODE;
+                replyMessenger.send(animationReply);
+
+                // Set reply message id and path to animate.
+                reply.arg1 = requestId;
+                reply.arg2 = GeneratorView.ACTIVITY_NODE;
+
+                Log.d(TAG, "UUID reply = " + reply);
+
+                // Send the reply back to the Activity.
+                replyMessenger.send(reply);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        });
+
     }
 
     /**
@@ -107,55 +160,6 @@ class RequestHandler
                        uniqueID);
         reply.setData(data);
         return reply;
-    }
-
-    /**
-     * Hook method called back when a request Message arrives from the
-     * UniqueIDGeneratorActivity.  The message it receives contains
-     * the Messenger used to reply to the Activity.
-     */
-    public void handleMessage(Message request) {
-
-        // Store the reply messenger so it doesn't change out from
-        // underneath us.
-        final Messenger replyMessenger = request.replyTo;
-
-        // Store the request id so that it can be bounced back
-        // as in arg1 of the replay message.
-        final int requestId = request.arg1;
-
-        // Log.d(TAG, "replyMessenger = " + replyMessenger.hashCode());
-
-        // Create a runnable give it to the thread pool for subsequent
-        // concurrent processing.
-        mExecutor.execute(() -> {
-            try {
-                // Send an reply to show an animation from the
-                // service to this thread.
-                Message animationReply = Message.obtain();
-                animationReply.arg1 = requestId;
-                animationReply.arg2 = (int)Thread.currentThread().getId();
-                replyMessenger.send(animationReply);
-
-                // Generate a unique ID.
-                Message reply = generateUniqueID();
-
-                // Send a replay to show an animation back
-                // from thread to service.
-                animationReply.arg2 = GeneratorView.SERVICE_NODE;
-                replyMessenger.send(animationReply);
-
-                // Set reply message id and path to animate.
-                reply.arg1 = requestId;
-                reply.arg2 = GeneratorView.ACTIVITY_NODE;
-
-                // Send the reply back to the Activity.
-                replyMessenger.send(reply);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        });
-
     }
 }
 
