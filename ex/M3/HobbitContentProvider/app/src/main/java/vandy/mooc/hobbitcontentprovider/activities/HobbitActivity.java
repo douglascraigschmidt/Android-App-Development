@@ -429,8 +429,6 @@ public class HobbitActivity
          
         /**
          * Delete all characters from the HobbitContentProvider.
-         * Plays the role of a "template method" in the Template
-         * Method pattern.
          */
         public int deleteAll() 
             throws RemoteException {
