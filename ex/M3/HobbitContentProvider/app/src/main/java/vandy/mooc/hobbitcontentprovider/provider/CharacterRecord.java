@@ -1,9 +1,12 @@
 package vandy.mooc.hobbitcontentprovider.provider;
 
+import android.database.Cursor;
+import android.support.annotation.NonNull;
+
 /**
  * A simple POJO that stores information about Hobbit characters.
  */
-class CharacterRecord {
+public class CharacterRecord {
     /**
      * Start at 0.
      */
@@ -46,30 +49,46 @@ class CharacterRecord {
     }
 
     /**
+     * Constructor initializes all fields from a cursor.
+     */
+    CharacterRecord(@NonNull Cursor cursor) {
+        mId = cursor.getInt(cursor.getColumnIndex(CharacterContract.CharacterEntry._ID));
+        mName = cursor.getString(cursor.getColumnIndex(CharacterContract.CharacterEntry.COLUMN_NAME));
+        mRace = cursor.getString(cursor.getColumnIndex(CharacterContract.CharacterEntry.COLUMN_RACE));
+    }
+
+    /**
+     * Static builder method returns a new character record from a given cursor.
+     */
+    public static CharacterRecord fromCursor(Cursor cursor) {
+        return new CharacterRecord(cursor);
+    }
+
+    /**
      * @return the id of the character.
      */
-    long getId() {
+    public long getId() {
         return mId;
     }
 
     /**
      * @return the name of the character.
      */
-    String getName() {
+    public String getName() {
         return mName;
     }
 
     /**
      * @return the race of the character.
      */
-    String getRace() {
+    public String getRace() {
         return mRace;
     }
 
     /**
      * Set the race of the character.
      */
-    void setRace(String race) {
+    public void setRace(String race) {
         mRace = race;
     }
 }

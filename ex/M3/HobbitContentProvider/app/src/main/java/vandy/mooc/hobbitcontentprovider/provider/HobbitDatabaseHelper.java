@@ -15,7 +15,7 @@ public class HobbitDatabaseHelper
     /**
      * Database name.
      */
-    private static String DATABASE_NAME =
+    private static final String DATABASE_NAME =
         "vandy_mooc_hobbit_db";
 
     /**
@@ -46,7 +46,7 @@ public class HobbitDatabaseHelper
      * application's cache directory, which will be automatically
      * cleaned up by Android if the device runs low on storage space.
      * 
-     * @param context
+     * @param context Any context
      */
     public HobbitDatabaseHelper(Context context) {
         super(context, 

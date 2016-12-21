@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- STYLES -->
+
+    <style name="CardViewStyle" parent="CardView.Light">
+        <item name="android:background">@color/card_background_color</item>
+        <item name="android:layout_marginBottom">@dimen/card_marginBottom</item>
+        <item name="android:layout_marginEnd">@dimen/card_marginStartEnd</item>
+        <item name="android:layout_marginStart">@dimen/card_marginStartEnd</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="CardTitleStyle">
+        <item name="android:textColor">@color/card_title_text_color</item>
+        <item name="android:textSize">@dimen/card_title_text_size</item>
+        <item name="android:layout_marginLeft">@dimen/card_item_margin_start</item>
+        <item name="android:layout_marginTop">@dimen/card_title_margin_top</item>
+        <item name="android:layout_marginBottom">@dimen/card_title_margin_bottom</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <!-- Card and card item dimensions -->
+    <dimen name="card_marginStartEnd">8dp</dimen>
+    <dimen name="card_marginBottom">8dp</dimen>
+
+    <dimen name="card_title_text_size">16sp</dimen>
+    <dimen name="card_entry_text_size">16sp</dimen>
+    <dimen name="card_title_margin_top">4dp</dimen>
+    <dimen name="card_title_margin_bottom">4dp</dimen>
+
+    <dimen name="card_item_margin_start">8dp</dimen>
+    <dimen name="card_item_margin_end">8dp</dimen>
+    <dimen name="card_item_margin_bottom">4dp</dimen>
+    <dimen name="card_item_margin_top">4dp</dimen>
+
+    <dimen name="divider_line_height">1dp</dimen>
+
+    <!-- Card and card item colors -->
+    <!--<color name="card_title_text_color">#202020</color>-->
+    <color name="card_title_text_color">@color/colorAccent</color>
+    <color name="card_background_color">#ffffff</color>
+    <color name="divider_line_color">#e0e0e0</color>
+
+
+    <!-- Card strings -->
+</resources>

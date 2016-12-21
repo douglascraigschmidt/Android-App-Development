@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:name="vandy.mooc.hobbitcontentprovider.activities.RaceFragment"
+    style="@style/CardViewStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context="vandy.mooc.hobbitcontentprovider.activities.RaceFragment">
+
+    <LinearLayout
+        android:id="@+id/card_contents"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:duplicateParentState="true"
+        android:focusable="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/CardTitleStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:duplicateParentState="true"
+            tools:text="Title"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_line_height"
+            android:background="@color/divider_line_color"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/card_item_margin_bottom"
+            android:layout_marginEnd="@dimen/card_item_margin_end"
+            android:layout_marginStart="@dimen/card_item_margin_start"
+            android:layout_marginTop="@dimen/card_item_margin_top"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="false"
+            app:layoutManager="GridLayoutManager"
+            app:spanCount="4"
+            tools:listitem="@layout/fragment_race_item"/>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
+

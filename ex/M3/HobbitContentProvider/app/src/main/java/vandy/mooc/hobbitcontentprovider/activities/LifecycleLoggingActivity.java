@@ -1,14 +1,14 @@
 package vandy.mooc.hobbitcontentprovider.activities;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 /**
  * This abstract class extends the Activity class and overrides lifecycle
  * callbacks for logging various lifecycle events.
  */
-public abstract class LifecycleLoggingActivity extends Activity {
+public abstract class LifecycleLoggingActivity extends AppCompatActivity {
     /**
      * Debugging tag used by the Android logger.
      */
@@ -19,9 +19,8 @@ public abstract class LifecycleLoggingActivity extends Activity {
      * initialization code should go here e.g. UI layout, some class scope
      * variable initialization. if finish() is called from onCreate no other
      * lifecycle callbacks are called except for onDestroy().
-     * 
-     * @param savedInstanceState
-     *            object that contains saved state information.
+     *
+     * @param savedInstanceState object that contains saved state information.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +71,8 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // hook method is being called.
         super.onResume();
         Log.d(TAG,
-              "onResume() - the activity has become visible (it is now \"resumed\")");
+              "onResume() - the activity has become visible (it is now "
+                      + "\"resumed\")");
     }
 
     /**
@@ -89,7 +89,8 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // hook method is being called.
         super.onPause();
         Log.d(TAG,
-              "onPause() - another activity is taking focus (this activity is about to be \"paused\")");
+              "onPause() - another activity is taking focus (this activity is"
+                      + " about to be \"paused\")");
     }
 
     /**
@@ -104,7 +105,8 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // hook method is being called.
         super.onStop();
         Log.d(TAG,
-              "onStop() - the activity is no longer visible (it is now \"stopped\")");
+              "onStop() - the activity is no longer visible (it is now "
+                      + "\"stopped\")");
     }
 
     /**
@@ -121,9 +123,9 @@ public abstract class LifecycleLoggingActivity extends Activity {
     }
 
     /**
-     * Hook method that gives a final chance to release resources and
-     * stop spawned threads.  This method may not always be called
-     * when the Android system kills the hosting process.
+     * Hook method that gives a final chance to release resources and stop
+     * spawned threads.  This method may not always be called when the Android
+     * system kills the hosting process.
      */
     @Override
     protected void onDestroy() {

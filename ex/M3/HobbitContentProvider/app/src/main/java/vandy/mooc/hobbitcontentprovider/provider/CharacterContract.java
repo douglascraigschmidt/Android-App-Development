@@ -1,8 +1,6 @@
 package vandy.mooc.hobbitcontentprovider.provider;
 
-import vandy.mooc.hobbitcontentprovider.R;
 import android.content.ContentUris;
-import android.content.UriMatcher;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -27,11 +25,11 @@ public final class CharacterContract {
 
     /**
      * Possible paths (appended to base content URI for possible
-     * URI's).  For instance, content://vandy.mooc/character_table/ is
-     * a valid path for looking at Character data.  Conversely,
-     * content://vandy.mooc/givemeroot/ will fail, as the
-     * ContentProvider hasn't been given any information on what to do
-     * with "givemeroot".
+     * URI's), e.g., a valid path for looking at Character data is
+     * content://vandy.mooc.hobbitcontentprovider/character_table .
+     * However, content://vandy.mooc.hobbitcontentprovider/givemeroot
+     * will fail, as the ContentProvider hasn't been given any
+     * information on what to do with "givemeroot".
      */
     public static final String PATH_CHARACTER =
         CharacterEntry.TABLE_NAME;
@@ -44,7 +42,8 @@ public final class CharacterContract {
      * Inner class that defines the table contents of the Hobbit
      * table.
      */
-    public static final class CharacterEntry implements BaseColumns {
+    public static final class CharacterEntry 
+           implements BaseColumns {
         /**
          * Use BASE_CONTENT_URI to create the unique URI for Acronym
          * Table that apps will use to contact the content provider.
@@ -84,16 +83,6 @@ public final class CharacterContract {
         };
     
         /**
-         * Resource Ids of the columns to display.
-         */
-        public static final int[] sColumnResIds = 
-            new int[] {
-            R.id.idString, 	
-            R.id.name, 
-            R.id.race
-        };
-
-        /**
          * Name of the database table.
          */
         public static final String TABLE_NAME =
@@ -107,9 +96,9 @@ public final class CharacterContract {
 
         /**
          * Return a Uri that points to the row containing a given id.
-         * 
-         * @param id
-         * @return Uri
+         *
+         * @param id row id
+         * @return Uri URI for the specified row id
          */
         public static Uri buildUri(Long id) {
             return ContentUris.withAppendedId(CONTENT_URI,

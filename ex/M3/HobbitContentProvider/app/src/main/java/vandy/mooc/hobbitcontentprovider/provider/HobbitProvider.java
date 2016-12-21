@@ -7,13 +7,13 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.net.Uri;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 /**
- * Content Provider interface used to manage Hobbit characters.
+ * Implements a Content Provider used to manage Hobbit characters.
  */
 public class HobbitProvider 
        extends ContentProvider {
@@ -98,7 +98,7 @@ public class HobbitProvider
      * URI.  
      */
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         // Match the id returned by UriMatcher to return appropriate
         // MIME_TYPE.
         switch (sUriMatcher.match(uri)) {
@@ -113,13 +113,14 @@ public class HobbitProvider
     }
 
     /**
-     * Method called to handle insert requests from client
-     * applications.
+     * Method called to handle insert requests from client apps.
      */
     @Override
-    public Uri insert(Uri uri,
+    public Uri insert(@NonNull Uri uri,
                       ContentValues cvs) {
         Uri returnUri;
+
+        printCharacters("inserting", cvs, uri);
 
         // Try to match against the path in a url.  It returns the
         // code for the matched node (added using addURI), or -1 if
@@ -164,8 +165,12 @@ public class HobbitProvider
      * Method that handles bulk insert requests.
      */
     @Override
-    public int bulkInsert(Uri uri,
+    public int bulkInsert(@NonNull Uri uri,
                           ContentValues[] cvsArray) {
+
+        for (ContentValues cvs : cvsArray)
+            printCharacters("bulk inserting", cvs, uri);
+
         // Try to match against the path in a url.  It returns the
         // code for the matched node (added using addURI), or -1 if
         // there is no matched node.  If there's a match bulk insert
@@ -226,7 +231,7 @@ public class HobbitProvider
      * applications.
      */
     @Override
-    public Cursor query(Uri uri,
+    public Cursor query(@NonNull Uri uri,
                         String[] projection,
                         String selection,
                         String[] selectionArgs,
@@ -311,11 +316,13 @@ public class HobbitProvider
      * applications.
      */
     @Override
-    public int update(Uri uri,
+    public int update(@NonNull Uri uri,
                       ContentValues cvs,
                       String selection,
                       String[] selectionArgs) {
         int returnCount;
+
+        printCharacters("updating", cvs, uri);
 
         // Try to match against the path in a url.  It returns the
         // code for the matched node (added using addURI), or -1 if
@@ -390,10 +397,12 @@ public class HobbitProvider
      * applications.
      */
     @Override
-    public int delete(Uri uri,
+    public int delete(@NonNull Uri uri,
                       String selection,
                       String[] selectionArgs) {
         int returnCount;
+
+        printSelectionArgs("deleting", selection, selectionArgs, uri);
 
         // Try to match against the path in a url.  It returns the
         // code for the matched node (added using addURI), or -1 if
@@ -486,15 +495,10 @@ public class HobbitProvider
             selectionResult += (selection
                        + " = ?");
 
-            // Output the selectionResults to Logcat.
-            Log.d(TAG,
-                  "selection = "
-                  + selectionResult
-                  + " selectionArgs = ");
-            for (String args : selectionArgs)
-                Log.d(TAG,
-                      args
-                      + " ");
+            printSelectionArgs(operation,
+                               selectionResult,
+                               selectionArgs,
+                               null);
 
             return selectionResult;
         }
@@ -518,5 +522,47 @@ public class HobbitProvider
             + " = '"
             + id 
             + "'";
+    }
+
+    /**
+     * Print out the characters to logcat.
+     *
+     * @param operation
+     * @param cvs
+     * @param uri
+     */
+    void printCharacters(String operation,
+                         ContentValues cvs,
+                         Uri uri) {
+        Log.d(TAG, operation + " on " + uri);
+        for (String key : cvs.keySet()) {
+            Log.d(TAG, key + " " + cvs.get(key));
+        }
+
+    }
+
+    /**
+     * Printout the selection args to logcat.
+     *
+     * @param operation
+     * @param selectionResult
+     * @param selectionArgs
+     */
+    void printSelectionArgs(String operation,
+                            String selectionResult,
+                            String[] selectionArgs,
+                            Uri uri) {
+        // Output the selectionResults to Logcat.
+        Log.d(TAG,
+                operation
+                        + " on "
+                        + (uri == null ? "null" : uri)
+                        + " selection = "
+                        + selectionResult
+                        + " selectionArgs = ");
+        if (selectionArgs != null && selectionArgs.length > 0)
+            for (String args : selectionArgs)
+                Log.d(TAG,
+                        args + " ");
     }
 }

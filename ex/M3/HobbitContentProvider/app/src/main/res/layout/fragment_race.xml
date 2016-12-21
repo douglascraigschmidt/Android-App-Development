@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="vandy.mooc.hobbitcontentprovider.activities.HobbitActivity"
+    tools:showIn="@layout/activity_main">
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:paddingBottom="@dimen/card_marginBottom"
+        android:baselineAligned="false"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="addAll"
+                android:text="@string/add_all"/>
+
+            <Button
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="modifyAll"
+                android:text="@string/modify_all"/>
+
+            <Button
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="deleteAll"
+                android:text="@string/delete_all"/>
+        </LinearLayout>
+
+        <include
+            android:id="@+id/hobbit_card"
+            layout="@layout/card_race"/>
+
+        <include
+            android:id="@+id/bear_card"
+            layout="@layout/card_race"/>
+
+        <include
+            android:id="@+id/maia_card"
+            layout="@layout/card_race"/>
+
+        <include
+            android:id="@+id/human_card"
+            layout="@layout/card_race"/>
+
+        <include
+            android:id="@+id/dwarf_card"
+            layout="@layout/card_race"/>
+
+        <include
+            android:id="@+id/dragon_card"
+            layout="@layout/card_race"/>
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>
+
