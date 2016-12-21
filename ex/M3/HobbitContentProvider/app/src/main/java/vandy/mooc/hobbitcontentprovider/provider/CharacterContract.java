@@ -5,7 +5,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- * This contract defines the metadata for the HobbitContentProvider,
+ * This contract defines the metadata for the HobbitProvider,
  * including the provider's access URIs and its "database" constants.
  */
 public final class CharacterContract {
@@ -24,9 +24,9 @@ public final class CharacterContract {
                   + CONTENT_AUTHORITY);
 
     /**
-     * Possible paths (appended to base content URI for possible
-     * URI's), e.g., a valid path for looking at Character data is
-     * content://vandy.mooc.hobbitcontentprovider/character_table .
+     * This string is appended to base content URI for possible
+     * URI's, e.g., a valid path for looking at Character data is
+     * content://vandy.mooc.hobbitcontentprovider/character_table.
      * However, content://vandy.mooc.hobbitcontentprovider/givemeroot
      * will fail, as the ContentProvider hasn't been given any
      * information on what to do with "givemeroot".
@@ -39,13 +39,13 @@ public final class CharacterContract {
      */
 
     /**
-     * Inner class that defines the table contents of the Hobbit
+     * Nested class that defines the table contents of the Hobbit
      * table.
      */
     public static final class CharacterEntry 
            implements BaseColumns {
         /**
-         * Use BASE_CONTENT_URI to create the unique URI for Acronym
+         * Use BASE_CONTENT_URI to create the unique URI for Character
          * Table that apps will use to contact the content provider.
          */
         public static final Uri CONTENT_URI = 

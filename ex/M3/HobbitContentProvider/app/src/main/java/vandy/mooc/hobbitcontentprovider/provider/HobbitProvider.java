@@ -35,20 +35,6 @@ public class HobbitProvider
     private Context mContext;
 
     /**
-     * Return true if successfully started.
-     */
-    @Override
-    public boolean onCreate() {
-        mContext = getContext();
-
-        // Select the concrete implementor.
-        // Create the HobbitDatabaseHelper.
-        mOpenHelper =
-            new HobbitDatabaseHelper(mContext);
-        return true;
-    }
-
-    /**
      * The code that is returned when a URI for more than 1 items is
      * matched against the given components.  Must be positive.
      */
@@ -67,8 +53,22 @@ public class HobbitProvider
         buildUriMatcher();
 
     /**
-     * Helper method to match each URI to the ACRONYM integers
-     * constant defined above.
+     * Hook method returns true if successfully started.
+     */
+    @Override
+    public boolean onCreate() {
+        mContext = getContext();
+
+        // Select the concrete implementor.
+        // Create the HobbitDatabaseHelper.
+        mOpenHelper =
+                new HobbitDatabaseHelper(mContext);
+        return true;
+    }
+
+    /**
+     * Helper method that matches each URI to the integer
+     * constants defined above.
      * 
      * @return UriMatcher
      */

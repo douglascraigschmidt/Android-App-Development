@@ -7,7 +7,6 @@ import android.os.RemoteException;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -15,22 +14,21 @@ import android.widget.Toast;
 import vandy.mooc.hobbitcontentprovider.R;
 
 /**
- * This activity interacts with the user to coordinate performing
- * various "CRUD" (i.e., insert, query, update, and delete) operations
- * on the HobbitContentProvider using characters from Tolkien's
- * classic book "The Hobbit."
+ * This activity interacts with the user to coordinate performing various "CRUD"
+ * (i.e., insert, query, update, and delete) operations on the HobbitProvider
+ * using characters from Tolkien's classic novel "The Hobbit."
  */
 public class HobbitActivity
        extends LifecycleLoggingActivity
        implements RaceFragment.OnClassClickCallback {
     /**
-     * Uri for the "Necromancer".
+     * Uri for the "Necromancer" to store its value for update operations.
      */
     private Uri mNecromancerUri;
 
     /**
-     * An instance of an inner class that consolidates and simplifies operations
-     * on the HobbitContentProvider.
+     * An instance of a helper class that consolidates and simplifies operations
+     * on the HobbitProvider.
      */
     private HobbitOps mHobbitOps;
 

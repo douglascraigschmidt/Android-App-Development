@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * The database helper used by the Hobbit Content Provider to create
+ * The database helper used by the HobbitProvider to create
  * and manage its underlying SQLite database.
  */
 public class HobbitDatabaseHelper 

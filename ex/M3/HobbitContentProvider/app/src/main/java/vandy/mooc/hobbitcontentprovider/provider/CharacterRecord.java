@@ -52,9 +52,12 @@ public class CharacterRecord {
      * Constructor initializes all fields from a cursor.
      */
     CharacterRecord(@NonNull Cursor cursor) {
-        mId = cursor.getInt(cursor.getColumnIndex(CharacterContract.CharacterEntry._ID));
-        mName = cursor.getString(cursor.getColumnIndex(CharacterContract.CharacterEntry.COLUMN_NAME));
-        mRace = cursor.getString(cursor.getColumnIndex(CharacterContract.CharacterEntry.COLUMN_RACE));
+        mId = cursor.getInt(cursor.getColumnIndex
+                (CharacterContract.CharacterEntry._ID));
+        mName = cursor.getString(cursor.getColumnIndex
+                (CharacterContract.CharacterEntry.COLUMN_NAME));
+        mRace = cursor.getString(cursor.getColumnIndex
+                (CharacterContract.CharacterEntry.COLUMN_RACE));
     }
 
     /**
