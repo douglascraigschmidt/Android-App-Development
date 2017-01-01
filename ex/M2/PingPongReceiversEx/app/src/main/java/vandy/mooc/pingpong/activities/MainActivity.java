@@ -48,7 +48,7 @@ public class MainActivity
     private FloatingActionButton mSetFab;
 
     /**
-     * Reference to the "play" floating action button.
+     * Reference to the "start or stop" floating action button.
      */
     private FloatingActionButton mStartOrStopFab;
 
@@ -268,8 +268,8 @@ public class MainActivity
                 UiUtils.hideFab(mStartOrStopFab);
             }
         } else {
-            // Hide the EditText using circular reveal animation
-            // and set boolean to true.
+            // Reveal the EditText using circular reveal animation and
+            // set boolean to true.
             UiUtils.revealEditText(mCountEditText);
             mIsEditTextVisible = true;
             mCountEditText.requestFocus();

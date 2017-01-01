@@ -171,8 +171,8 @@ public class DownloadActivity
             // Hides the download FAB.
             UiUtils.hideFab(mDownloadFab);
         } else {
-            // Hide the EditText using circular reveal animation
-            // and set boolean to true.
+            // Reveal the EditText using circular reveal animation and
+            // set boolean to true.
             UiUtils.revealEditText(mUrlEditText);
             mIsEditTextVisible = true;
             mUrlEditText.requestFocus();
