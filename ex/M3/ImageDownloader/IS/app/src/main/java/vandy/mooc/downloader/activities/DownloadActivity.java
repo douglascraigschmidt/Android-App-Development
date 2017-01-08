@@ -197,8 +197,8 @@ public class DownloadActivity
             UiUtils.hideKeyboard(this,
                                  mUrlEditText.getWindowToken());
 
-            // Create a new Intent and start an Activity that
-            // downloads an image from the URL given by the user.
+            // Start a service that downloads an image from the URL
+            // given by the user.
             startDownloadImageService(getUrl());
         } catch (Exception e) {
             e.printStackTrace();
