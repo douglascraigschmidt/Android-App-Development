@@ -169,8 +169,8 @@ public class DownloadActivity
             // Hides the download FAB.
             UiUtils.hideFab(mDownloadFab);
         } else {
-            // Reveal the EditText using circular reveal animation and
-            // set boolean to true.
+            // Hide the EditText using circular reveal animation
+            // and set boolean to true.
             UiUtils.revealEditText(mUrlEditText);
             mIsEditTextVisible = true;
             mUrlEditText.requestFocus();
@@ -197,9 +197,9 @@ public class DownloadActivity
             UiUtils.hideKeyboard(this,
                                  mUrlEditText.getWindowToken());
 
-            // Start a service that downloads an image from the URL
-            // given by the user.
-            startDownloadImageService(getUrl());
+            // Start the DownloadService to downloads an image from
+            // the URL given by the user.
+            startDownloadService(getUrl());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -225,7 +225,7 @@ public class DownloadActivity
      *
      * @param url The URL for the image to download.
      */
-    private void startDownloadImageService(Uri url) {
+    private void startDownloadService(Uri url) {
         // Make sure there's a non-null URL.
         if (url != null) {
             // Make sure that there's not already a download in progress.
