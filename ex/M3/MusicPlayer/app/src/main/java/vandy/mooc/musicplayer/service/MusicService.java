@@ -14,8 +14,10 @@ import java.io.IOException;
 /**
  * This MusicService extends Service and uses a MediaPlayer to
  * download and play a song in the background.  Although it runs in
- * the UI Thread, it implements MediaPlayer.OnPreparedListener to
- * avoid blocking the UI Thread while a song is initially streamed.
+ * the main thread (which could also be the UI thread if the
+ * AndroidManifest.xml file is changed to remove the "android:process"
+ * attribute), it implements MediaPlayer.OnPreparedListener to avoid
+ * blocking the main thread while a song is initially streamed.
  */
 public class MusicService 
        extends Service
