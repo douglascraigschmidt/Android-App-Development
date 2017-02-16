@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import vandy.mooc.uniqueidgen.R;
-import vandy.mooc.uniqueidgen.service.UniqueIDGenService;
+import vandy.mooc.uniqueidgen.services.UniqueIDGenService;
 
 /**
  * A custom view class that animates a circle along path view widgets that

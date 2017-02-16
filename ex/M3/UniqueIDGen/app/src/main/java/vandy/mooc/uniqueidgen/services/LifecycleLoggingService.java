@@ -1,4 +1,4 @@
-package vandy.mooc.uniqueidgen.services
+package vandy.mooc.uniqueidgen.services;
 
 import android.app.Service;
 import android.content.Intent;

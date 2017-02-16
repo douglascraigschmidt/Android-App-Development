@@ -19,7 +19,7 @@
         </activity>
 
         <service
-            android:name=".service.UniqueIDGenService"
+            android:name=".services.UniqueIDGenService"
             android:exported="true"
             android:process=":IdService">
         </service>
