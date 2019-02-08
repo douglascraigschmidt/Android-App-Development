@@ -2,7 +2,7 @@
     <string name="app_name">ImageDownloaderBR</string>
     <string name="download_image_activity">DownLoadImageActivity</string>
     <string name="download_image">Download Image</string>
-    <string name="defaultURL">http://www.dre.vanderbilt.edu/~schmidt/robot.png</string>
+    <string name="defaultURL">https://www.dre.vanderbilt.edu/~schmidt/gifs/dougs-xsmall.jpg</string>
     <string name="hintprompt">Please touch the floating action button to add an address</string>
     <string name="enter_url">Enter URL (or press enter for default)</string>
     <string name="downloading">Downloading...</string>

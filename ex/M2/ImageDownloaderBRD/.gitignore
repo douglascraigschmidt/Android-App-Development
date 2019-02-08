@@ -1,2 +1,10 @@
-/build
+*.iml
+.idea/
+.DS_Store
+build/
+captures/
+# Gradle files
+.gradle/
 local.properties
+proguard/
+*.log

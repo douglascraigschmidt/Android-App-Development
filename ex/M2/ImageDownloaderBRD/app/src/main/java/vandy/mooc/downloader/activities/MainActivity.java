@@ -3,11 +3,15 @@ package vandy.mooc.downloader.activities;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.support.v4.content.LocalBroadcastManager;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -29,13 +33,13 @@ import vandy.mooc.downloader.utils.UriUtils;
  * dynamically registered broadcast receiver view it.
  */
 public class MainActivity
-       extends ActivityBase {
+        extends ActivityBase {
     /**
      * URL for the image that's downloaded by default if the user
      * doesn't specify otherwise.
      */
     private final static String DEFAULT_URL =
-            "http://www.dre.vanderbilt.edu/~schmidt/robot.png";
+            "https://www.dre.vanderbilt.edu/~schmidt/gifs/dougs-xsmall.jpg";
 
     /**
      * Action used by the LocalBroadcastManger to identify the
@@ -43,35 +47,6 @@ public class MainActivity
      */
     private static final String ACTION_VIEW_LOCAL =
             "ActionViewLocalBroadcast";
-
-   /**
-     * EditText field for entering the desired URL to an image.
-     */
-    private EditText mUrlEditText;
-
-    /**
-     * Keeps track of whether a download button click from the user is
-     * processed or not.  Only one download click is processed until a
-     * requested image is downloaded and displayed.
-     */
-    private boolean mProcessButtonClick = true;
-
-    /**
-     * Reference to the "add" floating action button.
-     */
-    private FloatingActionButton mAddFab;
-
-    /**
-     * Reference to the "download" floating action button.
-     */
-    private FloatingActionButton mDownloadFab;
-
-    /**
-     * Keeps track of whether the edit text is visible for the user to
-     * enter a URL.
-     */
-    private boolean mIsEditTextVisible = false;
-
     /**
      * An instance of a local broadcast receiver implementation that
      * receives a broadcast intent containing a local image Uri and
@@ -79,14 +54,49 @@ public class MainActivity
      */
     private final BroadcastReceiver mDownloadReceiver =
             new DownloadReceiver();
+    /**
+     * EditText field for entering the desired URL to an image.
+     */
+    private EditText mUrlEditText;
+    /**
+     * Keeps track of whether a download button click from the user is
+     * processed or not.  Only one download click is processed until a
+     * requested image is downloaded and displayed.
+     */
+    private boolean mProcessButtonClick = true;
+    /**
+     * Reference to the "add" floating action button.
+     */
+    private FloatingActionButton mAddFab;
+    /**
+     * Reference to the "download" floating action button.
+     */
+    private FloatingActionButton mDownloadFab;
+    /**
+     * Keeps track of whether the edit text is visible for the user to
+     * enter a URL.
+     */
+    private boolean mIsEditTextVisible = false;
+
+    /**
+     * Factory method to construct an intent that can be used to
+     * broadcast the downloaded image Uri to the DownloadReceiver in
+     * MainActivity.
+     *
+     * @param pathToImageFile The Uri of the downloaded image.
+     */
+    public static Intent makeDownloadCompleteIntent(Uri pathToImageFile) {
+        return new Intent(MainActivity.ACTION_VIEW_LOCAL)
+                .putExtra("URI",
+                        pathToImageFile.toString());
+    }
 
     /**
      * Hook method called when a new instance of Activity is
      * created. One time initialization code goes here, e.g., UI
      * snackbar and some class scope variable initialization.
      *
-     * @param savedInstanceState
-     *            object that contains saved state information.
+     * @param savedInstanceState object that contains saved state information.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,87 +124,13 @@ public class MainActivity
         // Create a new broadcast intent filter that will filter and
         // receive ACTION_VIEW_LOCAL intents.
         IntentFilter intentFilter =
-            new IntentFilter(MainActivity.ACTION_VIEW_LOCAL);
+                new IntentFilter(MainActivity.ACTION_VIEW_LOCAL);
 
         // Call the Activity class helper method to register this
         // local receiver instance.
         LocalBroadcastManager.getInstance(this)
-                             .registerReceiver(mDownloadReceiver,
-                                               intentFilter);
-    }
-
-    /**
-     * Target of a broadcast from the ImageDownloadActivity when an
-     * image file has been downloaded successfully.
-     */
-    private class DownloadReceiver
-            extends BroadcastReceiver {
-        /**
-         * Hook method called by the Android ActivityManagerService
-         * framework when a broadcast has been sent.
-         *
-         * @param context The caller's context.
-         * @param uriData An intent containing the Uri of the downloaded image.
-         */
-        @Override
-        public void onReceive(Context context,
-                              Intent uriData) {
-            Log.d(TAG, "onReceive() called.");
-            viewImage(context, uriData);
-        }
-
-        /**
-         * Start an activity that will launch the Gallery activity by
-         * passing in the path to the downloaded image file contained
-         * in @a data.
-         *
-         * @param context The caller's context.
-         * @param uriData  An intent containing the Uri of the downloaded image.
-         */
-        private void viewImage(Context context,
-                               Intent uriData) {
-            // Call makeGalleryIntent() factory method to create an
-            // intent.
-            Intent intent =
-                makeGalleryIntent(context,
-                                  uriData.getStringExtra("URI"));
-
-            // Allow user to click the download button again.
-            mProcessButtonClick = true;
-
-            // Start the default Android Gallery app image viewer.
-            startActivity(intent);
-        }
-
-        /**
-         * Factory method that returns an implicit Intent for viewing
-         * the downloaded image in the Gallery app.
-         *
-         * @param context The caller's context.
-         * @param pathToImageFile The Uri of the downloaded image.
-         */
-        private Intent makeGalleryIntent(Context context,
-                                         String pathToImageFile) {
-            // Create intent that starts Gallery app to view image.
-            return UriUtils.buildFileProviderReadUriIntent
-                (context,
-                 Uri.fromFile(new File(pathToImageFile)),
-                 Intent.ACTION_VIEW,
-                 "image/*");
-        }
-    }
-
-    /**
-     * Factory method to construct an intent that can be used to
-     * broadcast the downloaded image Uri to the DownloadReceiver in
-     * MainActivity.
-     *
-     * @param pathToImageFile The Uri of the downloaded image.
-     */
-    public static Intent makeDownloadCompleteIntent(Uri pathToImageFile) {
-        return new Intent(MainActivity.ACTION_VIEW_LOCAL)
-            .putExtra("URI",
-                      pathToImageFile.toString());
+                .registerReceiver(mDownloadReceiver,
+                        intentFilter);
     }
 
     /**
@@ -238,13 +174,13 @@ public class MainActivity
      * Release resources that may cause a memory leak.
      */
     @Override
-    protected void onDestroy(){
+    protected void onDestroy() {
         // Always call super method.
         super.onDestroy();
 
         // Unregister the broadcast receiver.
         LocalBroadcastManager.getInstance(this)
-                             .unregisterReceiver(mDownloadReceiver);
+                .unregisterReceiver(mDownloadReceiver);
     }
 
     /**
@@ -253,48 +189,47 @@ public class MainActivity
     private void initializeViews() {
         // Cache the EditText that holds the urls entered by the
         // user (if any).
-        mUrlEditText = (EditText) findViewById(R.id.url);
+        mUrlEditText = findViewById(R.id.url);
 
         // Cache floating action button that adds a URL.
-        mAddFab =
-            (FloatingActionButton) findViewById(R.id.add_fab);
+        mAddFab = findViewById(R.id.add_fab);
 
         // Cache floating action button that downloads an image.
-        mDownloadFab =
-            (FloatingActionButton) findViewById(R.id.download_fab);
+        mDownloadFab = findViewById(R.id.download_fab);
 
         // Make the EditText invisible for animation purposes
         mUrlEditText.setVisibility(View.INVISIBLE);
 
         // Make the download button invisible for animation purposes
-        mDownloadFab.setVisibility(View.INVISIBLE);
+        mDownloadFab.hide();
 
         // Register a listener to help display download FAB when the user
         // hits enter.
         mUrlEditText.setOnEditorActionListener
-            ((v, actionId, event) -> {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH
-                    || actionId == EditorInfo.IME_ACTION_DONE
-                    || event.getAction() == KeyEvent.ACTION_DOWN
-                    && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    UiUtils.hideKeyboard(MainActivity.this,
-                                         mUrlEditText.getWindowToken());
-                    // Insert default value if no input was specified.
-                    if (TextUtils.isEmpty(
-                            mUrlEditText.getText().toString().trim())) {
-                        mUrlEditText.setText(
-                                String.valueOf(DEFAULT_URL));
-                    }
-                    UiUtils.showFab(mDownloadFab);
-                    return true;
-                } else
-                    return false;
-            });
+                ((v, actionId, event) -> {
+                    if (actionId == EditorInfo.IME_ACTION_SEARCH
+                            || actionId == EditorInfo.IME_ACTION_DONE
+                            || event.getAction() == KeyEvent.ACTION_DOWN
+                            && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                        UiUtils.hideKeyboard(MainActivity.this,
+                                mUrlEditText.getWindowToken());
+                        // Insert default value if no input was specified.
+                        if (TextUtils.isEmpty(
+                                mUrlEditText.getText().toString().trim())) {
+                            mUrlEditText.setText(
+                                    String.valueOf(DEFAULT_URL));
+                        }
+                        UiUtils.showFab(mDownloadFab);
+                        return true;
+                    } else
+                        return false;
+                });
     }
 
     /**
      * Called by the Android Activity framework when the user clicks +
      * floating action button.
+     *
      * @param view The view
      */
     public void addUrl(View view) {
@@ -334,14 +269,13 @@ public class MainActivity
      * Called by the Android Activity framework when the user clicks
      * the "Download Image" button.
      *
-     * @param view
-     *            The view.
+     * @param view The view.
      */
     public void downloadImage(View view) {
         try {
             // Hide the keyboard.
             UiUtils.hideKeyboard(this,
-                                 mUrlEditText.getWindowToken());
+                    mUrlEditText.getWindowToken());
 
             // Call startDownloadImageActivity() to create a new
             // Intent and start an Activity that downloads an image
@@ -364,5 +298,66 @@ public class MainActivity
             userInput = DEFAULT_URL;
 
         return Uri.parse(userInput);
+    }
+
+    /**
+     * Target of a broadcast from the ImageDownloadActivity when an
+     * image file has been downloaded successfully.
+     */
+    private class DownloadReceiver
+            extends BroadcastReceiver {
+        /**
+         * Hook method called by the Android ActivityManagerService
+         * framework when a broadcast has been sent.
+         *
+         * @param context The caller's context.
+         * @param uriData An intent containing the Uri of the downloaded image.
+         */
+        @Override
+        public void onReceive(Context context,
+                              Intent uriData) {
+            Log.d(TAG, "onReceive() called.");
+            viewImage(context, uriData);
+        }
+
+        /**
+         * Start an activity that will launch the Gallery activity by
+         * passing in the path to the downloaded image file contained
+         * in @a data.
+         *
+         * @param context The caller's context.
+         * @param uriData An intent containing the Uri of the downloaded image.
+         */
+        private void viewImage(Context context,
+                               Intent uriData) {
+            // Call makeGalleryIntent() factory method to create an
+            // intent.
+            Intent intent =
+                    makeGalleryIntent(context,
+                            uriData.getStringExtra("URI"));
+
+            // Allow user to click the download button again.
+            mProcessButtonClick = true;
+
+            // Start the default Android Gallery app image viewer.
+            startActivity(intent);
+        }
+
+        /**
+         * Factory method that returns an implicit Intent for viewing
+         * the downloaded image in the Gallery app.
+         *
+         * @param context         The caller's context.
+         * @param pathToImageFile The Uri of the downloaded image.
+         */
+        private Intent makeGalleryIntent(Context context,
+                                         String pathToImageFile) {
+            // Create intent that starts Gallery app to view image.
+            return UriUtils.buildFileProviderReadUriIntent
+                    (context,
+                            Uri.fromFile(new File(pathToImageFile)),
+                            Intent.ACTION_VIEW,
+                            "image/*");
+        }
     }
 }

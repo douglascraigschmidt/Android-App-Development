@@ -1,6 +1,8 @@
 package vandy.mooc.downloader.activities;
 
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -65,14 +67,14 @@ public class DownloadImageActivity
         setContentView(R.layout.download_image_activity);
 
         // Store the ProgressBar in a field for fast access.
-        mLoadingProgressBar = (ProgressBar)
-                findViewById(R.id.progressBar_loading);
+        mLoadingProgressBar = findViewById(R.id.progressBar_loading);
     }
 
     /**
      * Hook method called after onStart(), just before the activity
      * (re)gains focus.  
      */
+    @SuppressLint("StaticFieldLeak")
     @Override
     protected void onResume() {
         // Always call super class for necessary
