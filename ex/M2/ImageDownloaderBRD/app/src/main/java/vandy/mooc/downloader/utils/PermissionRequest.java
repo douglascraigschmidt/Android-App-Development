@@ -10,8 +10,11 @@ import android.os.Build;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+
 import com.google.android.material.snackbar.Snackbar;
+
 import androidx.core.app.ActivityCompat;
+
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -147,7 +150,7 @@ public class PermissionRequest {
      * method.
      *
      * @param requestCode  The request code passed in
-     * {@link Builder#permissions(String...)}.
+     *                     {@link Builder#permissions(String...)}.
      * @param permissions  The requested permissions. Never null.
      * @param grantResults The grant results for the corresponding permissions
      *                     which is either
