@@ -27,7 +27,7 @@ public class MusicActivity
      * doesn't specify otherwise.
      */
     private final static String DEFAULT_SONG =
-            "http://www.dre.vanderbilt.edu/~schmidt/little-wing.mp3";
+            "https://www.dre.vanderbilt.edu/~schmidt/little-wing.mp3";
 
     /**
      * EditText field for entering the desired URL to a song.

@@ -36,7 +36,7 @@ public class DownloadActivity
      * doesn't specify otherwise.
      */
     private final static String DEFAULT_URL =
-            "http://www.dre.vanderbilt.edu/~schmidt/robot.png";
+            "https://www.dre.vanderbilt.edu/~schmidt/gifs/dougs-xsmall.jpg";
 
     /**
      * EditText field for entering the desired URL to an image.
